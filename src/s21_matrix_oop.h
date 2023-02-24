@@ -1,4 +1,5 @@
-#include <stdio.h>
+// #define SRC_S21_MATRIX_OOP_H_
+#ifndef SRC_S21_MATRIX_OOP_H_
 
 class S21Matrix {
  private:
@@ -6,19 +7,19 @@ class S21Matrix {
   double** matrix_;
 
  public:
-  S21Matrix(/* args */);
-  ~S21Matrix();
+  // S21Matrix();
 
-  void SumMatrix(const S21Matrix& other);
-  void SubMatrix(const S21Matrix& other);
-  void MulNumber(const double num);
-  void MulMatrix(const S21Matrix& other);
-  S21Matrix Transpose();
-  S21Matrix CalcComplements();
-  double Determinant();
-  S21Matrix InverseMatrix();
+  S21Matrix(int rows, int cols);
+  // S21Matrix(const S21Matrix& other);
+  // S21Matrix(const S21Matrix&& other);
+
+  double& operator()(int i, int j);
+
+  // ~S21Matrix();
 };
 
-S21Matrix::S21Matrix(/* args */) {}
+// S21Matrix ::S21Matrix(/* args */) {}
 
-S21Matrix::~S21Matrix() {}
+// S21Matrix ::~S21Matrix() {}
+
+#endif
