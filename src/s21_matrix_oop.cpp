@@ -6,26 +6,38 @@
 
 using namespace std;
 
-double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
+S21Matrix::S21Matrix() {
+  rows_ = 2;
+  cols_ = 2;
+  aloc_matrix(rows_, cols_);
+}
 
 S21Matrix::S21Matrix(int rows, int cols) {
   rows_ = rows;
   cols_ = cols;
+  aloc_matrix(rows_, cols_);
+}
+
+void S21Matrix::aloc_matrix(int rows, int cols) {
   matrix_ = new double*[rows_];
   for (int i = 0; i < rows_; i++) {
     matrix_[i] = new double[cols_];
+    memset(matrix_[i], 0, sizeof(double) * cols_);
   }
-  // memset(matrix_, 0, sizeof(double) * cols_ * rows_);
 }
+
+double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
 
 int main(void) {
   int rows = 2;
   int cols = 2;
-  S21Matrix basic(rows, cols);
-  basic(0, 0) = 1.0;
-  basic(0, 1) = 22.0;
-  basic(1, 0) = 333.0;
-  basic(1, 1) = 444.0;
+  // S21Matrix basic(rows, cols);
+  S21Matrix basic;
+
+  // basic(0, 0) = 1.0;
+  // basic(0, 1) = 22.0;
+  // basic(1, 0) = 333.0;
+  // basic(1, 1) = 444.0;
 
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
