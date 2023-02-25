@@ -13,23 +13,22 @@ class S21Matrix {
   S21Matrix(const S21Matrix& other);
   S21Matrix(const S21Matrix&& other);
 
-  // ADDITIONAL FUNCTIONS:
-  void aloc_matrix(int rows, int cols);
-  int getRows();
-  int getCols();
-  double** getMatrix();
-
-  void setRows(int rows);
-  void setCols(int cols);
-
   // OPERTATORS:
   double& operator()(int i, int j);
 
+  // OPERATIONS
+  bool EqMatrix(const S21Matrix& other);
+
+  // ADDITIONAL FUNCTIONS:
+  void alocMatrix(int& rows, int& cols);
+  int getRows() const;
+  int getCols() const;
+  double** getMatrix() const;
+
+  int setRows(int& rows) const;
+  int setCols(int& cols) const;
+
   ~S21Matrix();
 };
-
-// S21Matrix ::S21Matrix(/* args */) {}
-
-// S21Matrix ::~S21Matrix() {}
 
 #endif

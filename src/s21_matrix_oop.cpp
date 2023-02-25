@@ -10,14 +10,18 @@ S21Matrix::S21Matrix() {
   int row_col = 2;
   setRows(row_col);
   setCols(row_col);
-  aloc_matrix(rows_, cols_);
+  alocMatrix(rows_, cols_);
 }
 
 S21Matrix::S21Matrix(int rows, int cols) {
   cout << "Constructor 2" << endl;
-  setRows(rows);
-  setCols(cols);
-  aloc_matrix(rows_, cols_);
+  if (setRows(rows)) {
+    throw invalid_argument("Invalid number of rows" + to_string(rows));
+  }
+  if (setCols(cols)) {
+    throw invalid_argument("Invalid number of cols" + to_string(cols));
+  }
+  alocMatrix(rows_, cols_);
 }
 
 S21Matrix::S21Matrix(const S21Matrix& other)
@@ -30,9 +34,15 @@ S21Matrix::S21Matrix(const S21Matrix& other)
   }
 }
 
-S21Matrix::S21Matrix(const S21Matrix&& other)
-    : rows_(other.rows_), cols_(other.cols_), matrix_(other.matrix_) {
+S21Matrix::S21Matrix(const S21Matrix&& other) {
   cout << "MOVE" << endl;
+  if (setRows(other.rows_)) {
+    throw invalid_argument("Invalid number of rows" + to_string(other.rows_));
+  }
+  if (setCols(other.cols_)) {
+    throw invalid_argument("Invalid number of cols" + to_string(other.cols_));
+  }
+  matrix_ = other.matrix_;
   other.matrix_ = nullptr;
   other.cols_ = 0;
   other.rows_ = 0;
@@ -48,45 +58,54 @@ S21Matrix::~S21Matrix() {
   }
 }
 
-void S21Matrix::aloc_matrix(int rows, int cols) {
+void S21Matrix::alocMatrix(int& rows, int& cols) {
   matrix_ = new double*[rows_];
   for (int i = 0; i < rows_; i++) {
     matrix_[i] = new double[cols_];
   }
 }
 
-int S21Matrix::getRows() { return rows_; }
-int S21Matrix::getCols() { return cols_; }
-double** S21Matrix::getMatrix() { return matrix_; }
+int S21Matrix::getRows() const { return rows_; }
+int S21Matrix::getCols() const { return cols_; }
+double** S21Matrix::getMatrix() const { return matrix_; }
 
-void S21Matrix::setRows(int rows) {
-  if (rows < 0) {
-    throw invalid_argument("Invalid number of rows: " + to_string(rows));
+int S21Matrix::setRows(int& rows) const {
+  int err = 0;
+  if (rows <= 0) {
+    return err = 1;
   }
   if (rows == rows_) {
-    return;
+    return err = 1;
   }
   rows_ = rows;
+  return err;
 }
 
-void S21Matrix::setCols(int cols) {
-  if (cols < 0) {
-    throw invalid_argument("Invalid number of cols: " + to_string(cols));
+int S21Matrix::setCols(int& cols) const {
+  int err = 0;
+  if (cols <= 0) {
+    return err = 1;
   }
   if (cols == cols_) {
-    return;
+    return err = 1;
   }
   cols_ = cols;
+  return err;
+}
+
+bool EqMatrix(const S21Matrix& other) {
+  if (getMatrix() == other.getMatrix()) return 1;
+  return 0;
 }
 
 double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
 
 int main(void) {
-  int rows = 0;
-  int cols = 2;
+  int rows = 7;
+  int cols = 11;
   // S21Matrix other(4, 4);
   // S21Matrix basic(rows, cols);
-  S21Matrix basic;
+  S21Matrix basic(rows, cols);
   // S21Matrix other(4, 4);
 
   basic(0, 0) = 10.11;
