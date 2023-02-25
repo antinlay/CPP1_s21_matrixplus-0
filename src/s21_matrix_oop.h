@@ -3,8 +3,8 @@
 
 class S21Matrix {
  private:
-  int rows_, cols_;
-  double** matrix_;
+  mutable int rows_, cols_;
+  mutable double** matrix_;
 
  public:
   S21Matrix();
@@ -15,7 +15,13 @@ class S21Matrix {
 
   // ADDITIONAL FUNCTIONS:
   void aloc_matrix(int rows, int cols);
-  void null_matrix(S21Matrix other);
+  int getRows();
+  int getCols();
+  double** getMatrix();
+
+  void setRows(int rows);
+  void setCols(int cols);
+
   // OPERTATORS:
   double& operator()(int i, int j);
 
