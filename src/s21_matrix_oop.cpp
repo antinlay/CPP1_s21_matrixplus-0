@@ -5,17 +5,13 @@
 
 using namespace std;
 
-S21Matrix::S21Matrix() {
+S21Matrix::S21Matrix() : rows_(2), cols_(2) {
   cout << "Constructor 1" << endl;
-  rows_ = 2;
-  cols_ = 2;
   aloc_matrix(rows_, cols_);
 }
 
-S21Matrix::S21Matrix(int rows, int cols) {
+S21Matrix::S21Matrix(int rows, int cols) : rows_(rows), cols_(cols) {
   cout << "Constructor 2" << endl;
-  rows_ = rows;
-  cols_ = cols;
   aloc_matrix(rows_, cols_);
 }
 
@@ -32,15 +28,7 @@ S21Matrix::S21Matrix(const S21Matrix& other)
 S21Matrix::S21Matrix(const S21Matrix&& other)
     : S21Matrix(other.rows_, other.cols_) {
   cout << "MOVE" << endl;
-  rows_ = other.rows_;
-  cols_ = other.cols_;
-  for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < cols_; j++) {
-      matrix_[i][j] = other.matrix_[i][j];
-    }
-  }
   null_matrix(other);
-  // other.matrix_ = nullptr;
 }
 
 S21Matrix::~S21Matrix() {
@@ -55,7 +43,6 @@ void S21Matrix::aloc_matrix(int rows, int cols) {
   matrix_ = new double*[rows_];
   for (int i = 0; i < rows_; i++) {
     matrix_[i] = new double[cols_];
-    memset(matrix_[i], 0, sizeof(double) * cols_);
   }
 }
 
@@ -75,18 +62,29 @@ int main(void) {
   S21Matrix basic;
   // S21Matrix other(4, 4);
 
-  basic(0, 0) = 1.0;
-  basic(0, 1) = 22.0;
-  basic(1, 0) = 333.0;
-  basic(1, 1) = 444.0;
+  basic(0, 0) = 10.11;
+  basic(0, 1) = 22.02;
+  basic(1, 0) = 333.3;
+  basic(1, 1) = 444.4;
 
   S21Matrix other(move(basic));
 
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
+  cout << "OTHER:" << endl;
+
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
       cout << other(i, j) << " ";
+    }
+    cout << endl;
+  }
+
+  cout << "BASIC:" << endl;
+
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      cout << basic(i, j) << " ";
     }
     cout << endl;
   }
