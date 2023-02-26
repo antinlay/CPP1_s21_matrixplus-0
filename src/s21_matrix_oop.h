@@ -5,7 +5,7 @@ class S21Matrix {
  private:
   mutable int rows_, cols_;
   mutable double** matrix_;
-  static int nCount;
+  // static int nCount;
 
  public:
   S21Matrix();
@@ -20,11 +20,13 @@ class S21Matrix {
   // OPERATIONS
   bool EqMatrix(const S21Matrix& other) const;
   void SumMatrix(const S21Matrix& other);
+  void SubMatrix(const S21Matrix& other);
 
   // ADDITIONAL FUNCTIONS:
   void alocMatrix(int& rows, int& cols);
   int getRows() const;
   int getCols() const;
+  // static int getCount() { return nCount; }
   double** getMatrix() const;
 
   int setRows(int& rows) const;

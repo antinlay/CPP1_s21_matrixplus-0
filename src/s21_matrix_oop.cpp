@@ -6,15 +6,16 @@
 using namespace std;
 
 S21Matrix::S21Matrix() {
-  cout << "Constructor 1" << endl;
+  cout << "Constructor 1 address: " << this << endl;
   int row_col = 2;
   setRows(row_col);
   setCols(row_col);
   alocMatrix(rows_, cols_);
+  // nCount++;
 }
 
 S21Matrix::S21Matrix(int rows, int cols) {
-  cout << "Constructor 2" << endl;
+  cout << "Constructor 2 address: " << this << endl;
   if (setRows(rows)) {
     throw invalid_argument("Invalid number of rows" + to_string(rows));
   }
@@ -22,11 +23,12 @@ S21Matrix::S21Matrix(int rows, int cols) {
     throw invalid_argument("Invalid number of cols" + to_string(cols));
   }
   alocMatrix(rows_, cols_);
+  // nCount++;
 }
 
 S21Matrix::S21Matrix(const S21Matrix& other)
     : S21Matrix(other.rows_, other.cols_) {
-  cout << "COPY" << endl;
+  cout << "COPY address: " << this << endl;
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
       matrix_[i][j] = other.matrix_[i][j];
@@ -35,7 +37,7 @@ S21Matrix::S21Matrix(const S21Matrix& other)
 }
 
 S21Matrix::S21Matrix(const S21Matrix&& other) {
-  cout << "MOVE" << endl;
+  cout << "MOVE address: " << this << endl;
   if (setRows(other.rows_)) {
     throw invalid_argument("Invalid number of rows" + to_string(other.rows_));
   }
@@ -49,7 +51,7 @@ S21Matrix::S21Matrix(const S21Matrix&& other) {
 }
 
 S21Matrix::~S21Matrix() {
-  cout << "Destructor RUN" << endl;
+  cout << "Destructor RUN address: " << this << endl;
   if (this->matrix_) {
     for (int i = 0; i < rows_; i++) {
       delete[] matrix_[i];
@@ -103,7 +105,27 @@ bool S21Matrix::EqMatrix(const S21Matrix& other) const {
   return true;
 }
 
-void S21Matrix::SumMatrix(const S21Matrix& other) {}
+void S21Matrix::SumMatrix(const S21Matrix& other) {
+  if (rows_ != other.rows_ || cols_ != other.cols_) {
+    throw invalid_argument("Invalid argument different matrix dimensions");
+  }
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      this->matrix_[i][j] += other.matrix_[i][j];
+    }
+  }
+}
+
+void S21Matrix::SubMatrix(const S21Matrix& other) {
+  if (rows_ != other.rows_ || cols_ != other.cols_) {
+    throw invalid_argument("Invalid argument different matrix dimensions");
+  }
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      this->matrix_[i][j] -= other.matrix_[i][j];
+    }
+  }
+}
 
 double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
 
@@ -125,6 +147,7 @@ int main(void) {
   basic(1, 3) = 444.4;
 
   S21Matrix other((basic));
+  other.SumMatrix(basic);
 
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
@@ -137,8 +160,9 @@ int main(void) {
       cout << endl;
     }
   }
+  basic.SubMatrix(other);
   if (basic.getMatrix()) {
-    cout << "BASIC:" << endl;
+    cout << "OTHER SUB:" << endl;
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         cout << basic(i, j) << " ";
@@ -152,5 +176,6 @@ int main(void) {
   } else {
     cout << "FALSE" << endl;
   }
+  // cout << basic.getCount() << endl;
   return 0;
 }
