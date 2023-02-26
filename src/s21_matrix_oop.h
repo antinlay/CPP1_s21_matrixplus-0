@@ -21,6 +21,8 @@ class S21Matrix {
   bool EqMatrix(const S21Matrix& other) const;
   void SumMatrix(const S21Matrix& other);
   void SubMatrix(const S21Matrix& other);
+  void MulNumber(const double num);
+  void MulMatrix(const S21Matrix& other);
 
   // ADDITIONAL FUNCTIONS:
   void alocMatrix(int& rows, int& cols);

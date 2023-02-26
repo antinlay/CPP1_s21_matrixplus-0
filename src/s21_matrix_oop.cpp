@@ -52,7 +52,7 @@ S21Matrix::S21Matrix(const S21Matrix&& other) {
 
 S21Matrix::~S21Matrix() {
   cout << "Destructor RUN address: " << this << endl;
-  if (this->matrix_) {
+  if (matrix_) {
     for (int i = 0; i < rows_; i++) {
       delete[] matrix_[i];
     }
@@ -96,10 +96,10 @@ int S21Matrix::setCols(int& cols) const {
 }
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) const {
-  if (this->rows_ != other.rows_ || cols_ != other.cols_) return false;
+  if (rows_ != other.rows_ || cols_ != other.cols_) return false;
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
-      if (this->matrix_[i][j] != other.matrix_[i][j]) return false;
+      if (matrix_[i][j] != other.matrix_[i][j]) return false;
     }
   }
   return true;
@@ -111,7 +111,7 @@ void S21Matrix::SumMatrix(const S21Matrix& other) {
   }
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
-      this->matrix_[i][j] += other.matrix_[i][j];
+      matrix_[i][j] += other.matrix_[i][j];
     }
   }
 }
@@ -122,7 +122,28 @@ void S21Matrix::SubMatrix(const S21Matrix& other) {
   }
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
-      this->matrix_[i][j] -= other.matrix_[i][j];
+      matrix_[i][j] -= other.matrix_[i][j];
+    }
+  }
+}
+
+void S21Matrix::MulNumber(const double num) {
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      matrix_[i][j] *= num;
+    }
+  }
+}
+
+void S21Matrix::MulMatrix(const S21Matrix& other) {
+  if (cols_ != other.rows_) {
+    throw invalid_argument(
+        "Invalid argument the number of columns of the first matrix is not "
+        "equal to the number of rows of the second matrix");
+  }
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      // matrix_[i][j] = other.matrix_[i][j];
     }
   }
 }
@@ -132,6 +153,7 @@ double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
 int main(void) {
   int rows = 2;
   int cols = 4;
+  const double num = 100.001;
   // S21Matrix other(4, 4);
   // S21Matrix basic(rows, cols);
   S21Matrix basic(rows, cols);
@@ -161,8 +183,9 @@ int main(void) {
     }
   }
   basic.SubMatrix(other);
+  basic.MulNumber(num);
   if (basic.getMatrix()) {
-    cout << "OTHER SUB:" << endl;
+    cout << "BASIC SUB & MULT:" << endl;
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         cout << basic(i, j) << " ";
