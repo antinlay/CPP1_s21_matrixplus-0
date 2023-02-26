@@ -17,7 +17,7 @@ class S21Matrix {
   double& operator()(int i, int j);
 
   // OPERATIONS
-  bool EqMatrix(const S21Matrix& other);
+  bool EqMatrix(const S21Matrix& other) const;
 
   // ADDITIONAL FUNCTIONS:
   void alocMatrix(int& rows, int& cols);

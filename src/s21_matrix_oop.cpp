@@ -75,7 +75,7 @@ int S21Matrix::setRows(int& rows) const {
     return err = 1;
   }
   if (rows == rows_) {
-    return err = 1;
+    return err = 0;
   }
   rows_ = rows;
   return err;
@@ -93,16 +93,21 @@ int S21Matrix::setCols(int& cols) const {
   return err;
 }
 
-bool EqMatrix(const S21Matrix& other) {
-  if (getMatrix() == other.getMatrix()) return 1;
-  return 0;
+bool S21Matrix::EqMatrix(const S21Matrix& other) const {
+  if (this->rows_ != other.rows_ || cols_ != other.cols_) return false;
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      if (this->matrix_[i][j] != other.matrix_[i][j]) return false;
+    }
+  }
+  return true;
 }
 
 double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
 
 int main(void) {
-  int rows = 7;
-  int cols = 11;
+  int rows = 4;
+  int cols = 4;
   // S21Matrix other(4, 4);
   // S21Matrix basic(rows, cols);
   S21Matrix basic(rows, cols);
@@ -118,14 +123,14 @@ int main(void) {
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
   cout << "OTHER:" << endl;
-
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      cout << other(i, j) << " ";
+  if (other.getMatrix()) {
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        cout << other(i, j) << " ";
+      }
+      cout << endl;
     }
-    cout << endl;
   }
-
   if (basic.getMatrix()) {
     cout << "BASIC:" << endl;
     for (int i = 0; i < rows; i++) {
@@ -134,6 +139,12 @@ int main(void) {
       }
       cout << endl;
     }
+  }
+  cout << "EQUAL:" << endl;
+  if (basic.EqMatrix(other)) {
+    cout << "TRUE" << endl;
+  } else {
+    cout << "FALSE" << endl;
   }
   return 0;
 }
