@@ -103,10 +103,12 @@ bool S21Matrix::EqMatrix(const S21Matrix& other) const {
   return true;
 }
 
+void S21Matrix::SumMatrix(const S21Matrix& other) {}
+
 double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
 
 int main(void) {
-  int rows = 4;
+  int rows = 2;
   int cols = 4;
   // S21Matrix other(4, 4);
   // S21Matrix basic(rows, cols);
@@ -115,10 +117,14 @@ int main(void) {
 
   basic(0, 0) = 10.11;
   basic(0, 1) = 22.02;
+  basic(0, 2) = 10.11;
+  basic(0, 3) = 22.02;
   basic(1, 0) = 333.3;
   basic(1, 1) = 444.4;
+  basic(1, 2) = 333.3;
+  basic(1, 3) = 444.4;
 
-  S21Matrix other(move(basic));
+  S21Matrix other((basic));
 
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
