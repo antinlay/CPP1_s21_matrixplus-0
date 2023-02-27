@@ -141,11 +141,16 @@ void S21Matrix::MulMatrix(const S21Matrix& other) {
         "Invalid argument the number of columns of the first matrix is not "
         "equal to the number of rows of the second matrix");
   }
+  S21Matrix res(other.rows_, cols_);
   for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < cols_; j++) {
-      // matrix_[i][j] = other.matrix_[i][j];
+    for (int j = 0; j < other.cols_; j++) {
+      for (int k = 0; k < cols_; k++) {
+        res.matrix_[i][j] += matrix_[i][k] * other.matrix_[k][j];
+      }
     }
   }
+  cols_ = res.cols_;
+  matrix_ = res.matrix_;
 }
 
 double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
@@ -168,26 +173,31 @@ int main(void) {
   basic(1, 2) = 333.3;
   basic(1, 3) = 444.4;
 
-  S21Matrix other((basic));
-  other.SumMatrix(basic);
+  // S21Matrix other((basic));
+  // other.SumMatrix(basic);
+  int row_o = 1, col_o = 2;
+  S21Matrix other(row_o, col_o);
+  other(0, 0) = 2;
+  other(0, 1) = 3;
+  other.MulMatrix(basic);
 
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
-  cout << "OTHER:" << endl;
+  cout << "OTHER:" << other.getRows() << other.getCols() << endl;
   if (other.getMatrix()) {
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
+    for (int i = 0; i < other.getRows(); i++) {
+      for (int j = 0; j < other.getCols(); j++) {
         cout << other(i, j) << " ";
       }
       cout << endl;
     }
   }
-  basic.SubMatrix(other);
-  basic.MulNumber(num);
+  // basic.SubMatrix(other);
+  // basic.MulNumber(num);
   if (basic.getMatrix()) {
     cout << "BASIC SUB & MULT:" << endl;
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
+    for (int i = 0; i < basic.getRows(); i++) {
+      for (int j = 0; j < basic.getCols(); j++) {
         cout << basic(i, j) << " ";
       }
       cout << endl;
