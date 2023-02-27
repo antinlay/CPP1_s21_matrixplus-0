@@ -1,28 +1,22 @@
 #include "s21_matrix_oop.h"
 
 #include <cstring>
+#include <functional>
 #include <iostream>
 
 using namespace std;
 
-S21Matrix::S21Matrix() {
+S21Matrix::S21Matrix() : rows_(2), cols_(2) {
   cout << "Constructor 1 address: " << this << endl;
-  int row_col = 2;
-  setRows(row_col);
-  setCols(row_col);
-  alocMatrix(rows_, cols_);
+  alocMatrix(&matrix_, rows_, cols_);
   // nCount++;
 }
 
-S21Matrix::S21Matrix(int rows, int cols) {
+S21Matrix::S21Matrix(int rows, int cols) : rows_(rows), cols_(cols) {
   cout << "Constructor 2 address: " << this << endl;
-  if (setRows(rows)) {
-    throw invalid_argument("Invalid number of rows" + to_string(rows));
-  }
-  if (setCols(cols)) {
-    throw invalid_argument("Invalid number of cols" + to_string(cols));
-  }
-  alocMatrix(rows_, cols_);
+  alocMatrix(&matrix_, rows_, cols_);
+  cout << " NEW MATRIX WITH rows: " << rows_ << " cols: " << cols_ << endl;
+
   // nCount++;
 }
 
@@ -38,12 +32,7 @@ S21Matrix::S21Matrix(const S21Matrix& other)
 
 S21Matrix::S21Matrix(const S21Matrix&& other) {
   cout << "MOVE address: " << this << endl;
-  if (setRows(other.rows_)) {
-    throw invalid_argument("Invalid number of rows" + to_string(other.rows_));
-  }
-  if (setCols(other.cols_)) {
-    throw invalid_argument("Invalid number of cols" + to_string(other.cols_));
-  }
+
   matrix_ = other.matrix_;
   other.matrix_ = nullptr;
   other.cols_ = 0;
@@ -60,10 +49,16 @@ S21Matrix::~S21Matrix() {
   }
 }
 
-void S21Matrix::alocMatrix(int& rows, int& cols) {
-  matrix_ = new double*[rows_];
-  for (int i = 0; i < rows_; i++) {
-    matrix_[i] = new double[cols_];
+void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
+  if (rows < 1) {
+    throw invalid_argument("Invalid number of rows" + to_string(rows));
+  }
+  if (cols < 1) {
+    throw invalid_argument("Invalid number of cols" + to_string(cols));
+  }
+  *matrix = new double*[rows];
+  for (int i = 0; i < rows; i++) {
+    (*matrix)[i] = new double[cols]();
   }
 }
 
@@ -71,29 +66,9 @@ int S21Matrix::getRows() const { return rows_; }
 int S21Matrix::getCols() const { return cols_; }
 double** S21Matrix::getMatrix() const { return matrix_; }
 
-int S21Matrix::setRows(int& rows) const {
-  int err = 0;
-  if (rows <= 0) {
-    return err = 1;
-  }
-  if (rows == rows_) {
-    return err = 0;
-  }
-  rows_ = rows;
-  return err;
-}
+void S21Matrix::setRows(int& rows) const { rows_ = rows; }
 
-int S21Matrix::setCols(int& cols) const {
-  int err = 0;
-  if (cols <= 0) {
-    return err = 1;
-  }
-  if (cols == cols_) {
-    return err = 1;
-  }
-  cols_ = cols;
-  return err;
-}
+void S21Matrix::setCols(int& cols) const { cols_ = cols; }
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) const {
   if (rows_ != other.rows_ || cols_ != other.cols_) return false;
@@ -136,24 +111,55 @@ void S21Matrix::MulNumber(const double num) {
 }
 
 void S21Matrix::MulMatrix(const S21Matrix& other) {
-  if (cols_ != other.rows_) {
+  if (other.rows_ != cols_) {
     throw invalid_argument(
         "Invalid argument the number of columns of the first matrix is not "
         "equal to the number of rows of the second matrix");
   }
-  S21Matrix res(other.rows_, cols_);
-  for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < other.cols_; j++) {
+  S21Matrix res(rows_, other.cols_);
+  for (int i = 0; i < res.rows_; i++) {
+    for (int j = 0; j < res.cols_; j++) {
+      double sum = 0;
       for (int k = 0; k < cols_; k++) {
-        res.matrix_[i][j] += matrix_[i][k] * other.matrix_[k][j];
+        sum += matrix_[i][k] * other.matrix_[k][j];
       }
+      res.matrix_[i][j] = sum;
     }
   }
-  cols_ = res.cols_;
-  matrix_ = res.matrix_;
+  *this = res;
 }
 
 double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
+
+S21Matrix& S21Matrix::operator=(const S21Matrix& other) {
+  rows_ = other.rows_;
+  cols_ = other.cols_;
+  alocMatrix(&matrix_, rows_, cols_);
+  cout << "  WHAT THE MATRIX rows: " << rows_ << " cols: " << cols_ << endl;
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      matrix_[i][j] = other.matrix_[i][j];
+    }
+  }
+  return *this;
+}
+
+// void S21Matrix::mainLoop(int i, int j, function<void(int, int)> func) {}
+
+S21Matrix& S21Matrix::operator+(const S21Matrix& other) {}
+
+void print(S21Matrix& other, string comment) {
+  cout << comment << endl;
+  cout << "rows: " << other.getRows() << " cols: " << other.getCols() << endl;
+  if (other.getMatrix()) {
+    for (int i = 0; i < other.getRows(); i++) {
+      for (int j = 0; j < other.getCols(); j++) {
+        cout << other(i, j) << " ";
+      }
+      cout << endl;
+    }
+  }
+}
 
 int main(void) {
   int rows = 2;
@@ -164,45 +170,40 @@ int main(void) {
   S21Matrix basic(rows, cols);
   // S21Matrix other(4, 4);
 
-  basic(0, 0) = 10.11;
-  basic(0, 1) = 22.02;
-  basic(0, 2) = 10.11;
-  basic(0, 3) = 22.02;
-  basic(1, 0) = 333.3;
-  basic(1, 1) = 444.4;
-  basic(1, 2) = 333.3;
-  basic(1, 3) = 444.4;
+  basic(0, 0) = 10.01;
+  basic(0, 1) = 20.02;
+  basic(0, 2) = 30.03;
+  basic(0, 3) = 40.04;
+  basic(1, 0) = 50.05;
+  basic(1, 1) = 60.06;
+  basic(1, 2) = 70.07;
+  basic(1, 3) = 80.08;
 
   // S21Matrix other((basic));
   // other.SumMatrix(basic);
-  int row_o = 1, col_o = 2;
+  int row_o = 3, col_o = 2;
   S21Matrix other(row_o, col_o);
-  other(0, 0) = 2;
-  other(0, 1) = 3;
+  other(0, 0) = 1.01;
+  other(0, 1) = 10.88;
+  other(1, 0) = 24;
+  other(1, 1) = 31;
+  other(2, 0) = 12;
+  other(2, 1) = 2.123;
+
+  print(basic, "BASIC BEFORE MULT");
+
   other.MulMatrix(basic);
 
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
-  cout << "OTHER:" << other.getRows() << other.getCols() << endl;
-  if (other.getMatrix()) {
-    for (int i = 0; i < other.getRows(); i++) {
-      for (int j = 0; j < other.getCols(); j++) {
-        cout << other(i, j) << " ";
-      }
-      cout << endl;
-    }
-  }
+
+  print(other, "OTHER:");
+
   // basic.SubMatrix(other);
   // basic.MulNumber(num);
-  if (basic.getMatrix()) {
-    cout << "BASIC SUB & MULT:" << endl;
-    for (int i = 0; i < basic.getRows(); i++) {
-      for (int j = 0; j < basic.getCols(); j++) {
-        cout << basic(i, j) << " ";
-      }
-      cout << endl;
-    }
-  }
+
+  print(basic, "BASIC AFTER MULT");
+
   cout << "EQUAL:" << endl;
   if (basic.EqMatrix(other)) {
     cout << "TRUE" << endl;
