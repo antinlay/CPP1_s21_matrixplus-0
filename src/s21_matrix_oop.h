@@ -20,9 +20,15 @@ class S21Matrix {
 
   // OPERTATORS:
   double& operator()(int i, int j);
-  S21Matrix& operator=(const S21Matrix& other);
-  S21Matrix& operator+(const S21Matrix& other);
-  S21Matrix& operator-(const S21Matrix& other);
+  void operator=(const S21Matrix& other);
+  S21Matrix operator+(const S21Matrix& other);
+  S21Matrix operator-(const S21Matrix& other);
+  S21Matrix operator*(const S21Matrix& other);
+  S21Matrix operator*(const double& num);
+  bool operator==(const S21Matrix& other);
+  void operator+=(const S21Matrix& other);
+  void operator-=(const S21Matrix& other);
+  void operator*=(const S21Matrix& other);
 
   // OPERATIONS
   bool EqMatrix(const S21Matrix& other) const;

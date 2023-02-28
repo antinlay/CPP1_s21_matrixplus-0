@@ -140,28 +140,51 @@ void S21Matrix::MulMatrix(const S21Matrix& other) {
 
 double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
 
-S21Matrix& S21Matrix::operator=(const S21Matrix& other) {
+void S21Matrix::operator=(const S21Matrix& other) {
   rows_ = other.rows_;
   cols_ = other.cols_;
   alocMatrix(&matrix_, rows_, cols_);
-  cout << "  WHAT THE MATRIX rows: " << rows_ << " cols: " << cols_ << endl;
+
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
       matrix_[i][j] = other.matrix_[i][j];
     }
   }
-  return *this;
+  cout << "  WHAT THE MATRIX rows: " << rows_ << " cols: " << cols_ << endl;
+  // return *this;
 }
 
-S21Matrix& S21Matrix::operator+(const S21Matrix& other) {
-  SumMatrix(other);
-  return *this;
+S21Matrix S21Matrix::operator+(const S21Matrix& other) {
+  S21Matrix res(*this);
+  res.SumMatrix(other);
+  return res;
 }
 
-S21Matrix& S21Matrix::operator-(const S21Matrix& other) {
-  SubMatrix(other);
-  return *this;
+S21Matrix S21Matrix::operator-(const S21Matrix& other) {
+  S21Matrix res(*this);
+  res.SubMatrix(other);
+  return res;
 }
+
+S21Matrix S21Matrix::operator*(const S21Matrix& other) {
+  S21Matrix res(*this);
+  res.MulMatrix(other);
+  return res;
+}
+
+S21Matrix S21Matrix::operator*(const double& num) {
+  S21Matrix res(*this);
+  MulNumber(num);
+  return res;
+}
+
+bool S21Matrix::operator==(const S21Matrix& other) { return EqMatrix(other); }
+
+void S21Matrix::operator+=(const S21Matrix& other) { SumMatrix(other); }
+
+void S21Matrix::operator-=(const S21Matrix& other) { SubMatrix(other); }
+
+void S21Matrix::operator*=(const S21Matrix& other) { MulMatrix(other); }
 
 void print(S21Matrix& other, string comment) {
   cout << comment << endl;
@@ -177,51 +200,88 @@ void print(S21Matrix& other, string comment) {
 }
 
 int main(void) {
-  int rows = 2;
-  int cols = 4;
+  int rows = 3;
+  int cols = 3;
   const double num = 100.001;
   // S21Matrix other(4, 4);
   // S21Matrix basic(rows, cols);
   S21Matrix basic(rows, cols);
   // S21Matrix other(4, 4);
 
-  basic(0, 0) = 10.01;
-  basic(0, 1) = 20.02;
-  basic(0, 2) = 30.03;
-  basic(0, 3) = 40.04;
-  basic(1, 0) = 50.05;
-  basic(1, 1) = 60.06;
-  basic(1, 2) = 70.07;
-  basic(1, 3) = 80.08;
+  basic(0, 0) = 1.01;
+  basic(0, 1) = 2.02;
+  basic(0, 2) = 3.03;
+  basic(1, 0) = 4.04;
+  basic(1, 1) = 5.05;
+  basic(1, 2) = 6.06;
+  basic(2, 0) = 7.07;
+  basic(2, 1) = 8.08;
+  basic(2, 2) = 9.09;
 
-  int row_o = 3, col_o = 2;
+  // S21Matrix basic2(rows, cols);
+  // // S21Matrix other(4, 4);
+
+  // basic2(0, 0) = 11.01;
+  // basic2(0, 1) = 22.02;
+  // basic2(0, 2) = 33.03;
+  // basic2(0, 3) = 44.04;
+  // basic2(1, 0) = 55.05;
+  // basic2(1, 1) = 66.06;
+  // basic2(1, 2) = 77.07;
+  // basic2(1, 3) = 88.08;
+
+  // S21Matrix sum(rows, cols);
+  // print(sum, "SUM BEFORE SUMM");
+  // print(basic2, "BASIC2 BEFORE SUMM:");
+  // // S21Matrix copy(basic * num);
+  // sum = basic2 + basic;
+  // // sum = basic2;
+  // for (int i = 0; i < 3; i++) {
+  //   sum += basic;
+  // }
+  // print(sum, "SUM BETWEEN += AND -=:");
+  // for (int i = 0; i < 3; i++) {
+  //   sum -= basic;
+  // }
+  // print(basic2, "BASIC2 AFTER SUMM:");
+  // print(sum, "SUM AFTER SUMM:");
+
+  int row_o = 3, col_o = 3;
   S21Matrix other(row_o, col_o);
   other(0, 0) = 1.01;
-  other(0, 1) = 10.88;
-  other(1, 0) = 24;
-  other(1, 1) = 31;
-  other(2, 0) = 12;
+  other(0, 1) = 1.88;
+  other(0, 2) = 1.88;
+  other(1, 0) = 2.4;
+  other(1, 1) = 3.1;
+  other(1, 2) = 3.1;
+  other(2, 0) = 1.2;
   other(2, 1) = 2.123;
+  other(2, 2) = 2.123;
 
-  print(basic, "BASIC BEFORE MULT");
-
-  other.MulMatrix(basic);
+  print(other, "OTHER BEFORE MULT");
+  // S21Matrix copy(basic * num);
+  for (int i = 0; i < 3; i++) {
+    other *= basic;
+  }
+  print(other, "OTHER AFTER MULT:");
+  // (basic * num);
+  // other.MulMatrix(basic);
   // S21Matrix* ptr_other = &other;
   S21Matrix copy(basic);
   copy.SumMatrix(basic);
-  other = copy - basic;
+  other = copy;
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
 
-  print(other, "OTHER:");
+  print(other, "OTHER AFTER EQ:");
 
   // basic.SubMatrix(other);
   // basic.MulNumber(num);
 
-  print(basic, "BASIC AFTER MULT");
+  print(basic, "BASIC AFTER MULT:");
 
   cout << "EQUAL:" << endl;
-  if (basic.EqMatrix(other)) {
+  if (copy == other) {
     cout << "TRUE" << endl;
   } else {
     cout << "FALSE" << endl;
