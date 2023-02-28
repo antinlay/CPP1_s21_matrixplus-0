@@ -22,6 +22,7 @@ class S21Matrix {
   double& operator()(int i, int j);
   S21Matrix& operator=(const S21Matrix& other);
   S21Matrix& operator+(const S21Matrix& other);
+  S21Matrix& operator-(const S21Matrix& other);
 
   // OPERATIONS
   bool EqMatrix(const S21Matrix& other) const;
@@ -34,7 +35,10 @@ class S21Matrix {
   void alocMatrix(double*** matrix, int& rows, int& cols);
   int getRows() const;
   int getCols() const;
-  // void mainLoop(int i, int j, function<void(int, int)> func);
+  // void mainLoop(int& rows, int& cols, void (*func)(int, int, S21Matrix));
+  // void cpy(int i, int j, S21Matrix& other) {
+  //   matrix_[i][j] = other.matrix_[i][j];
+  // }
   // static int getCount() { return nCount; }
   double** getMatrix() const;
 

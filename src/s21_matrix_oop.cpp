@@ -49,6 +49,15 @@ S21Matrix::~S21Matrix() {
   }
 }
 
+// void S21Matrix::mainLoop(int& rows, int& cols,
+//                          void (*func)(int, int, S21Matrix)) {
+//   for (int i = 0; i < rows; i++) {
+//     for (int j = 0; j < cols; j++) {
+//       func(i, j, S21Matrix&);
+//     }
+//   }
+// }
+
 void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
   if (rows < 1) {
     throw invalid_argument("Invalid number of rows" + to_string(rows));
@@ -144,9 +153,15 @@ S21Matrix& S21Matrix::operator=(const S21Matrix& other) {
   return *this;
 }
 
-// void S21Matrix::mainLoop(int i, int j, function<void(int, int)> func) {}
+S21Matrix& S21Matrix::operator+(const S21Matrix& other) {
+  SumMatrix(other);
+  return *this;
+}
 
-S21Matrix& S21Matrix::operator+(const S21Matrix& other) {}
+S21Matrix& S21Matrix::operator-(const S21Matrix& other) {
+  SubMatrix(other);
+  return *this;
+}
 
 void print(S21Matrix& other, string comment) {
   cout << comment << endl;
@@ -179,8 +194,6 @@ int main(void) {
   basic(1, 2) = 70.07;
   basic(1, 3) = 80.08;
 
-  // S21Matrix other((basic));
-  // other.SumMatrix(basic);
   int row_o = 3, col_o = 2;
   S21Matrix other(row_o, col_o);
   other(0, 0) = 1.01;
@@ -193,7 +206,10 @@ int main(void) {
   print(basic, "BASIC BEFORE MULT");
 
   other.MulMatrix(basic);
-
+  // S21Matrix* ptr_other = &other;
+  S21Matrix copy(basic);
+  copy.SumMatrix(basic);
+  other = copy - basic;
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
 
