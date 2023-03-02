@@ -1,7 +1,5 @@
 #include "s21_matrix_oop.h"
 
-#include <cstring>
-#include <functional>
 #include <iostream>
 
 using namespace std;
