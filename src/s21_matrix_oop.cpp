@@ -4,7 +4,7 @@
 
 using namespace std;
 
-S21Matrix::S21Matrix() : rows_(2), cols_(2) {
+S21Matrix::S21Matrix() : rows_(1), cols_(1) {
   cout << "Constructor 1 address: " << this << endl;
   alocMatrix(&matrix_, rows_, cols_);
   // nCount++;
@@ -58,10 +58,10 @@ S21Matrix::~S21Matrix() {
 
 void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
   if (rows < 1) {
-    throw invalid_argument("Invalid number of rows" + to_string(rows));
+    throw invalid_argument("Invalid number of rows " + to_string(rows));
   }
   if (cols < 1) {
-    throw invalid_argument("Invalid number of cols" + to_string(cols));
+    throw invalid_argument("Invalid number of cols " + to_string(cols));
   }
   *matrix = new double*[rows];
   for (int i = 0; i < rows; i++) {
@@ -136,7 +136,42 @@ void S21Matrix::MulMatrix(const S21Matrix& other) {
   *this = res;
 }
 
-double& S21Matrix::operator()(int i, int j) { return matrix_[i][j]; }
+S21Matrix S21Matrix::Transpose() {
+  S21Matrix other(cols_, rows_);
+  for (int i = 0; i < other.rows_; i++) {
+    for (int j = 0; j < other.cols_; j++) {
+      other.matrix_[i][j] = matrix_[j][i];
+    }
+  }
+  return other;
+}
+
+S21Matrix S21Matrix::Minor(int i, int j) {
+  checkIndexes(i, j);
+  int rows = rows_ - 1, cols = cols_ - 1;
+  if (rows_ == 1) rows = 1;
+  if (cols_ == 1) cols = 1;
+  S21Matrix minor(rows, cols);
+  int k = 0, l;
+  for (int m = 0; m < rows_; m++) {
+    if (i == m && rows_ != 1) continue;
+    l = 0;
+    for (int r = 0; r < cols_; r++) {
+      if (j == r && cols_ != 1) continue;
+      minor(k, l) = (*this)(m, r);
+      if (cols_ != 1) l++;
+    }
+    if (rows_ != 1) k++;
+  }
+  return minor;
+}
+
+S21Matrix S21Matrix::CalcComplements() {}
+
+double& S21Matrix::operator()(int i, int j) {
+  checkIndexes(i, j);
+  return matrix_[i][j];
+}
 
 void S21Matrix::operator=(const S21Matrix& other) {
   rows_ = other.rows_;
@@ -176,13 +211,26 @@ S21Matrix S21Matrix::operator*(const double& num) {
   return res;
 }
 
-bool S21Matrix::operator==(const S21Matrix& other) { return EqMatrix(other); }
+bool S21Matrix::operator==(const S21Matrix& other) const {
+  return EqMatrix(other);
+}
 
 void S21Matrix::operator+=(const S21Matrix& other) { SumMatrix(other); }
 
 void S21Matrix::operator-=(const S21Matrix& other) { SubMatrix(other); }
 
 void S21Matrix::operator*=(const S21Matrix& other) { MulMatrix(other); }
+
+void S21Matrix::checkIndexes(int i, int j) {
+  if (i < 0 || i > rows_ - 1) {
+    throw invalid_argument(
+        "Invalid argument i - number of rows must be grater or equal 0");
+  }
+  if (j < 0 || j > cols_ - 1) {
+    throw invalid_argument(
+        "Invalid argument j - number of cols must be grater or equal 0");
+  }
+}
 
 void print(S21Matrix& other, string comment) {
   cout << comment << endl;
@@ -248,30 +296,33 @@ int main(void) {
   S21Matrix other(row_o, col_o);
   other(0, 0) = 1.01;
   other(0, 1) = 1.88;
-  other(0, 2) = 1.88;
+  other(0, 2) = 1.98;
   other(1, 0) = 2.4;
   other(1, 1) = 3.1;
-  other(1, 2) = 3.1;
+  other(1, 2) = 3.2;
   other(2, 0) = 1.2;
   other(2, 1) = 2.123;
-  other(2, 2) = 2.123;
+  other(2, 2) = 2.223;
 
-  print(other, "OTHER BEFORE MULT");
+  print(other, "OTHER BEFORE TRANSP");
   // S21Matrix copy(basic * num);
-  for (int i = 0; i < 3; i++) {
-    other *= basic;
-  }
-  print(other, "OTHER AFTER MULT:");
+  // for (int i = 0; i < 3; i++) {
+  //   other *= basic;
+  // }
+  S21Matrix transp = other.Transpose();
+  S21Matrix minor = transp.Minor(1, 0);
+  print(transp, "OTHER AFTER TRANSP:");
+  print(minor, "MINOR OF TRANSP:");
   // (basic * num);
   // other.MulMatrix(basic);
   // S21Matrix* ptr_other = &other;
   S21Matrix copy(basic);
   copy.SumMatrix(basic);
-  other = copy;
+  // other = copy;
   // S21Matrix *ptr_basic = &basic;
   // ptr_basic->S21Matrix();
 
-  print(other, "OTHER AFTER EQ:");
+  // print(other, "OTHER AFTER EQ:");
 
   // basic.SubMatrix(other);
   // basic.MulNumber(num);

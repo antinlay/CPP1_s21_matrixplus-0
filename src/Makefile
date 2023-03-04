@@ -1,8 +1,8 @@
-GPP = g++
+GCC = gcc
 SOURCE = s21_matrix_oop.cpp
-OBJ = $(SOURCE:.c=.o)
+OBJ = $(SOURCE:.cpp=.o)
 CFLAGS=-std=c++17 -pthread
-TESTFLAGS=-lgtest_main -lgtest -lpthread -lgcov
+TESTFLAGS=-lgtest
 GCOVFLAGS =-L. --coverage
 HTML = lcov -t "test" -o rep.info -c -d .
 OS = $(shell uname)
@@ -13,15 +13,16 @@ clean:
 	rm -rf *.o *.a *.so *.gcda *.gcno *.gch rep.info *.html *.css test report *.txt *.dSYM
 
 test: s21_matrix_oop.a
-	$(GPP) $(CFLAGS) s21_matrix_oop.cpp s21_matrix_oop.a -o test 
+	$(GCC) $(CFLAGS) $(TESTFLAGS) s21_gtests.cpp s21_matrix_oop.a -o test 
 	./test
 
 s21_matrix_oop.a: clean $(OBJ)
 	ar rcs s21_matrix_oop.a $(OBJ)
 	ranlib s21_matrix_oop.a
 
+
 gcov_report: test
-	$(GPP) $(CFLAGS) s21_matrix_oop.cpp $(SOURCE) -o test
+	$(GCC) $(CFLAGS) $(SOURCE) s21_matrix_oop.a -o test
 	./test
 	$(HTML)
 	genhtml -o report rep.info

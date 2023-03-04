@@ -25,7 +25,7 @@ class S21Matrix {
   S21Matrix operator-(const S21Matrix& other);
   S21Matrix operator*(const S21Matrix& other);
   S21Matrix operator*(const double& num);
-  bool operator==(const S21Matrix& other);
+  bool operator==(const S21Matrix& other) const;
   void operator+=(const S21Matrix& other);
   void operator-=(const S21Matrix& other);
   void operator*=(const S21Matrix& other);
@@ -36,6 +36,11 @@ class S21Matrix {
   void SubMatrix(const S21Matrix& other);
   void MulNumber(const double num);
   void MulMatrix(const S21Matrix& other);
+  S21Matrix Transpose();
+  S21Matrix Minor(int i, int j);
+  S21Matrix CalcComplements();
+  // double Determinant();
+  // S21Matrix InverseMatrix();
 
   // ADDITIONAL FUNCTIONS:
   void alocMatrix(double*** matrix, int& rows, int& cols);
@@ -50,8 +55,11 @@ class S21Matrix {
 
   void setRows(int& rows) const;
   void setCols(int& cols) const;
+  void checkIndexes(int i, int j);
 
   ~S21Matrix();
 };
+
+// void print(S21Matrix& other, string comment);
 
 #endif
