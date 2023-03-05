@@ -1,11 +1,5 @@
 #include "s21_matrix_oop.hpp"
 
-#include <math.h>
-
-#include <iostream>
-
-using namespace std;
-
 S21Matrix::S21Matrix() : rows_(1), cols_(1) {
   cout << "Constructor 1 address: " << this << endl;
   alocMatrix(&matrix_, rows_, cols_);
@@ -67,7 +61,7 @@ void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
   }
   *matrix = new double*[rows];
   for (int i = 0; i < rows; i++) {
-    (*matrix)[i] = new double[cols]();
+    (*matrix)[i] = new double[cols];
   }
 }
 
@@ -75,9 +69,25 @@ int S21Matrix::getRows() const { return rows_; }
 int S21Matrix::getCols() const { return cols_; }
 double** S21Matrix::getMatrix() const { return matrix_; }
 
-void S21Matrix::setRows(int& rows) const { rows_ = rows; }
+void S21Matrix::setRows(int rows) {
+  if (rows == rows_) return;
+  // rows_ = rows;
+  double** new_matrix;
+  alocMatrix(&new_matrix, rows, cols_);
+  for (int i = 0; i < rows && i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      new_matrix[i][j] = matrix_[i][j];
+    }
+  }
+  for (int i = 0; i < rows_; i++) {
+    delete[] matrix_[i];
+  }
+  delete[] matrix_;
+  rows_ = rows;
+  matrix_ = new_matrix;
+}
 
-void S21Matrix::setCols(int& cols) const { cols_ = cols; }
+void S21Matrix::setCols(int cols) { cols_ = cols; }
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) const {
   if (rows_ != other.rows_ || cols_ != other.cols_) return false;
@@ -185,32 +195,33 @@ double S21Matrix::Determinant() {
 }
 
 S21Matrix S21Matrix::CalcComplements() {
-  // int r = 0, c = 0;
+  if (rows_ != cols_) {
+    throw invalid_argument(
+        "Invalid argument of rows or cols the matrix is not square");
+  }
   S21Matrix calc_compl(rows_, cols_);
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
       calc_compl(i, j) = Minor(i, j).Determinant() * pow(-1, i + j);
-      // c++;
     }
-    // r++;
   }
   return calc_compl;
 }
 
 S21Matrix S21Matrix::InverseMatrix() {
   double det = Determinant();
-  if (det == 0) {
+  if (fabs(det) < EPS) {
     throw runtime_error("Error: matrix determinant is 0");
   }
   S21Matrix inverse(cols_, rows_);
-  inverse = CalcComplements();
-  inverse = inverse.Transpose();
+  inverse = CalcComplements().Transpose();
   inverse.MulNumber(1 / det);
   return inverse;
 }
 
 double& S21Matrix::operator()(int i, int j) {
   checkIndexes(i, j);
+  matrix_[i][j] = matrix_[i][j] < EPS ? 0 : round(matrix_[i][j] / EPS) * EPS;
   return matrix_[i][j];
 }
 
@@ -290,7 +301,7 @@ int main(void) {
   int rows = 3;
   int cols = 3;
   const double num = 100.001;
-  double det = 0;
+  double det = round(0.000000001 / EPS) * EPS;
   // S21Matrix other(4, 4);
   // S21Matrix basic(rows, cols);
   S21Matrix basic(rows, cols);
@@ -314,8 +325,9 @@ int main(void) {
   calc = basic.InverseMatrix();
 
   calc.MulMatrix(basic);
+  calc.setRows(10);
 
-  print(calc, "INVERSE MATRIX: ");
+  print(calc, "CALC MATRIX: ");
 
   // S21Matrix basic2(rows, cols);
   // // S21Matrix other(4, 4);

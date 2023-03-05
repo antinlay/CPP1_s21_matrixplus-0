@@ -1,9 +1,13 @@
-#include <cstring>
-#include <functional>
-#include <iostream>
-
 #ifndef SRC_S21_MATRIX_OOP_H_
 #define SRC_S21_MATRIX_OOP_H_
+
+#define EPS 10E-9
+
+#include <cmath>
+#include <iostream>
+#include <limits>
+
+using namespace std;
 
 class S21Matrix {
  private:
@@ -54,8 +58,8 @@ class S21Matrix {
   // static int getCount() { return nCount; }
   double** getMatrix() const;
 
-  void setRows(int& rows) const;
-  void setCols(int& cols) const;
+  void setRows(int rows);
+  void setCols(int cols);
   void checkIndexes(int i, int j);
 
   ~S21Matrix();
