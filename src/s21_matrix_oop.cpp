@@ -1,4 +1,6 @@
-#include "s21_matrix_oop.h"
+#include "s21_matrix_oop.hpp"
+
+#include <math.h>
 
 #include <iostream>
 
@@ -146,19 +148,19 @@ S21Matrix S21Matrix::Transpose() {
   return other;
 }
 
-S21Matrix S21Matrix::Minor(int i, int j) {
-  checkIndexes(i, j);
+S21Matrix S21Matrix::Minor(int i_row, int j_col) {
+  checkIndexes(i_row, j_col);
   int rows = rows_ - 1, cols = cols_ - 1;
   if (rows_ == 1) rows = 1;
   if (cols_ == 1) cols = 1;
   S21Matrix minor(rows, cols);
   int k = 0, l;
-  for (int m = 0; m < rows_; m++) {
-    if (i == m && rows_ != 1) continue;
+  for (int r = 0; r < rows_; r++) {
+    if (i_row == r && rows_ != 1) continue;
     l = 0;
-    for (int r = 0; r < cols_; r++) {
-      if (j == r && cols_ != 1) continue;
-      minor(k, l) = (*this)(m, r);
+    for (int c = 0; c < cols_; c++) {
+      if (j_col == c && cols_ != 1) continue;
+      minor(k, l) = (*this)(r, c);
       if (cols_ != 1) l++;
     }
     if (rows_ != 1) k++;
@@ -167,45 +169,18 @@ S21Matrix S21Matrix::Minor(int i, int j) {
 }
 
 double S21Matrix::Determinant() {
-  // int s21_determinant(matrix_t *A, double result) {
-  int err = 0, ok = 0;
-  double quotient = 0, sign = 1, result = 0;
+  double result = 0;
   if (rows_ == 1) {
-    result = matrix_[0][0];
-  } else if (rows_ == 2) {
-    result = matrix_[0][0] * matrix_[1][1] - matrix_[0][1] * matrix_[1][0];
+    result = (*this)(0, 0);
   } else {
-    S21Matrix tmp(rows_, cols_);
-    for (int i = 0; i < rows_; i++) {
-      for (int j = 0; j < cols_; j++) {
-        tmp.matrix_[i][j] = matrix_[i][j];
-      }
+    for (int j = 0; j < cols_; j++) {
+      result += (*this)(0, j) * Minor(0, j).Determinant() * pow(-1, j);
     }
-    for (int i = 0; i < tmp.rows_; i++) {
-      if (tmp.matrix_[i][i] == 0) {
-        ok = swap_rows(&tmp, i);
-        sign = -sign;
-      }
-      if (!ok) {
-        for (int j = i + 1; j < tmp.rows_; j++) {
-          quotient = tmp.matrix_[j][i] / tmp.matrix_[i][i];
-          for (int x = i; x < tmp.cols_; x++) {
-            tmp.matrix_[j][x] =
-                tmp.matrix_[j][x] - quotient * tmp.matrix_[i][x];
-          }
-        }
-        result *= tmp.matrix_[i][i];
-      } else {
-        result = 0;
-        break;
-      }
-    }
-    if (!ok) result *= sign;
   }
   return result;
 }
 
-// S21Matrix S21Matrix::CalcComplements() {}
+S21Matrix S21Matrix::CalcComplements() {}
 
 double& S21Matrix::operator()(int i, int j) {
   checkIndexes(i, j);
@@ -288,20 +263,24 @@ int main(void) {
   int rows = 3;
   int cols = 3;
   const double num = 100.001;
+  double det = 0;
   // S21Matrix other(4, 4);
   // S21Matrix basic(rows, cols);
   S21Matrix basic(rows, cols);
   // S21Matrix other(4, 4);
 
-  basic(0, 0) = 1.01;
-  basic(0, 1) = 2.02;
-  basic(0, 2) = 3.03;
-  basic(1, 0) = 4.04;
-  basic(1, 1) = 5.05;
-  basic(1, 2) = 6.06;
-  basic(2, 0) = 7.07;
-  basic(2, 1) = 8.08;
-  basic(2, 2) = 9.09;
+  basic(0, 0) = 10;
+  basic(0, 1) = 11;
+  basic(0, 2) = 2;
+  basic(1, 0) = 3;
+  basic(1, 1) = 5;
+  basic(1, 2) = 6;
+  basic(2, 0) = 10;
+  basic(2, 1) = 2;
+  basic(2, 2) = 1;
+
+  det = basic.Determinant();
+  cout << det << endl;
 
   // S21Matrix basic2(rows, cols);
   // // S21Matrix other(4, 4);
@@ -333,15 +312,15 @@ int main(void) {
 
   int row_o = 3, col_o = 3;
   S21Matrix other(row_o, col_o);
-  other(0, 0) = 1.01;
-  other(0, 1) = 1.88;
-  other(0, 2) = 1.98;
-  other(1, 0) = 2.4;
-  other(1, 1) = 3.1;
-  other(1, 2) = 3.2;
-  other(2, 0) = 1.2;
-  other(2, 1) = 2.123;
-  other(2, 2) = 2.223;
+  other(0, 0) = 1;
+  other(0, 1) = 2;
+  other(0, 2) = 3;
+  other(1, 0) = 4;
+  other(1, 1) = 5;
+  other(1, 2) = 6;
+  other(2, 0) = 7;
+  other(2, 1) = 8;
+  other(2, 2) = 10;
 
   print(other, "OTHER BEFORE TRANSP");
   // S21Matrix copy(basic * num);
