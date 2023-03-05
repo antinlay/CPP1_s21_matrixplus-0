@@ -38,8 +38,8 @@ class S21Matrix {
   void MulMatrix(const S21Matrix& other);
   S21Matrix Transpose();
   S21Matrix Minor(int i, int j);
-  S21Matrix CalcComplements();
-  // double Determinant();
+  // S21Matrix CalcComplements();
+  double Determinant();
   // S21Matrix InverseMatrix();
 
   // ADDITIONAL FUNCTIONS:

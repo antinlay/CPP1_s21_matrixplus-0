@@ -166,7 +166,46 @@ S21Matrix S21Matrix::Minor(int i, int j) {
   return minor;
 }
 
-S21Matrix S21Matrix::CalcComplements() {}
+double S21Matrix::Determinant() {
+  // int s21_determinant(matrix_t *A, double result) {
+  int err = 0, ok = 0;
+  double quotient = 0, sign = 1, result = 0;
+  if (rows_ == 1) {
+    result = matrix_[0][0];
+  } else if (rows_ == 2) {
+    result = matrix_[0][0] * matrix_[1][1] - matrix_[0][1] * matrix_[1][0];
+  } else {
+    S21Matrix tmp(rows_, cols_);
+    for (int i = 0; i < rows_; i++) {
+      for (int j = 0; j < cols_; j++) {
+        tmp.matrix_[i][j] = matrix_[i][j];
+      }
+    }
+    for (int i = 0; i < tmp.rows_; i++) {
+      if (tmp.matrix_[i][i] == 0) {
+        ok = swap_rows(&tmp, i);
+        sign = -sign;
+      }
+      if (!ok) {
+        for (int j = i + 1; j < tmp.rows_; j++) {
+          quotient = tmp.matrix_[j][i] / tmp.matrix_[i][i];
+          for (int x = i; x < tmp.cols_; x++) {
+            tmp.matrix_[j][x] =
+                tmp.matrix_[j][x] - quotient * tmp.matrix_[i][x];
+          }
+        }
+        result *= tmp.matrix_[i][i];
+      } else {
+        result = 0;
+        break;
+      }
+    }
+    if (!ok) result *= sign;
+  }
+  return result;
+}
+
+// S21Matrix S21Matrix::CalcComplements() {}
 
 double& S21Matrix::operator()(int i, int j) {
   checkIndexes(i, j);
