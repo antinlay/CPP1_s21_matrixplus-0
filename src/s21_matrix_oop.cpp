@@ -62,6 +62,7 @@ void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
   *matrix = new double*[rows];
   for (int i = 0; i < rows; i++) {
     (*matrix)[i] = new double[cols];
+    // (*matrix)[i] = {0};
   }
 }
 
@@ -87,7 +88,22 @@ void S21Matrix::setRows(int rows) {
   matrix_ = new_matrix;
 }
 
-void S21Matrix::setCols(int cols) { cols_ = cols; }
+void S21Matrix::setCols(int cols) {
+  if (cols == cols_) return;
+  double** new_matrix;
+  alocMatrix(&new_matrix, rows_, cols);
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols && j < cols_; j++) {
+      new_matrix[i][j] = matrix_[i][j];
+    }
+  }
+  for (int i = 0; i < rows_; i++) {
+    delete[] matrix_[i];
+  }
+  delete[] matrix_;
+  cols_ = cols;
+  matrix_ = new_matrix;
+}
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) const {
   if (rows_ != other.rows_ || cols_ != other.cols_) return false;
@@ -221,7 +237,8 @@ S21Matrix S21Matrix::InverseMatrix() {
 
 double& S21Matrix::operator()(int i, int j) {
   checkIndexes(i, j);
-  matrix_[i][j] = matrix_[i][j] < EPS ? 0 : round(matrix_[i][j] / EPS) * EPS;
+  matrix_[i][j] =
+      fabs(matrix_[i][j]) < EPS ? 0 : round(matrix_[i][j] / EPS) * EPS;
   return matrix_[i][j];
 }
 
@@ -326,6 +343,7 @@ int main(void) {
 
   calc.MulMatrix(basic);
   calc.setRows(10);
+  calc.setCols(10);
 
   print(calc, "CALC MATRIX: ");
 
