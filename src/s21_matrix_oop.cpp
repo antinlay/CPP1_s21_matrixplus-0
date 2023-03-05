@@ -169,6 +169,10 @@ S21Matrix S21Matrix::Minor(int i_row, int j_col) {
 }
 
 double S21Matrix::Determinant() {
+  if (rows_ != cols_) {
+    throw invalid_argument(
+        "Invalid argument of rows or cols the matrix is not square");
+  }
   double result = 0;
   if (rows_ == 1) {
     result = (*this)(0, 0);
@@ -180,7 +184,30 @@ double S21Matrix::Determinant() {
   return result;
 }
 
-S21Matrix S21Matrix::CalcComplements() {}
+S21Matrix S21Matrix::CalcComplements() {
+  // int r = 0, c = 0;
+  S21Matrix calc_compl(rows_, cols_);
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      calc_compl(i, j) = Minor(i, j).Determinant() * pow(-1, i + j);
+      // c++;
+    }
+    // r++;
+  }
+  return calc_compl;
+}
+
+S21Matrix S21Matrix::InverseMatrix() {
+  double det = Determinant();
+  if (det == 0) {
+    throw runtime_error("Error: matrix determinant is 0");
+  }
+  S21Matrix inverse(cols_, rows_);
+  inverse = CalcComplements();
+  inverse = inverse.Transpose();
+  inverse.MulNumber(1 / det);
+  return inverse;
+}
 
 double& S21Matrix::operator()(int i, int j) {
   checkIndexes(i, j);
@@ -269,18 +296,26 @@ int main(void) {
   S21Matrix basic(rows, cols);
   // S21Matrix other(4, 4);
 
-  basic(0, 0) = 10;
-  basic(0, 1) = 11;
-  basic(0, 2) = 2;
+  basic(0, 0) = 1;
+  basic(0, 1) = 2;
+  basic(0, 2) = 4;
   basic(1, 0) = 3;
-  basic(1, 1) = 5;
-  basic(1, 2) = 6;
-  basic(2, 0) = 10;
-  basic(2, 1) = 2;
-  basic(2, 2) = 1;
+  basic(1, 1) = 3;
+  basic(1, 2) = 5;
+  basic(2, 0) = 2;
+  basic(2, 1) = 4;
+  basic(2, 2) = 4;
 
   det = basic.Determinant();
   cout << det << endl;
+  S21Matrix calc(3, 3);
+  // calc = basic.CalcComplements();
+  // calc = calc.Transpose();
+  calc = basic.InverseMatrix();
+
+  calc.MulMatrix(basic);
+
+  print(calc, "INVERSE MATRIX: ");
 
   // S21Matrix basic2(rows, cols);
   // // S21Matrix other(4, 4);

@@ -39,6 +39,7 @@ class S21Matrix {
   S21Matrix Transpose();
   S21Matrix Minor(int i, int j);
   S21Matrix CalcComplements();
+  S21Matrix InverseMatrix();
   double Determinant();
   // S21Matrix InverseMatrix();
 
