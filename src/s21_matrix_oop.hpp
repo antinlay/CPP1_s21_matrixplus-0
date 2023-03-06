@@ -5,7 +5,6 @@
 
 #include <cmath>
 #include <iostream>
-#include <limits>
 
 using namespace std;
 
@@ -49,6 +48,7 @@ class S21Matrix {
 
   // ADDITIONAL FUNCTIONS:
   void alocMatrix(double*** matrix, int& rows, int& cols);
+  void delMatrix(double** matrix);
   int getRows() const;
   int getCols() const;
   // void mainLoop(int& rows, int& cols, void (*func)(int, int, S21Matrix));
