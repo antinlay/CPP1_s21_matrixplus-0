@@ -12,7 +12,6 @@ class S21Matrix {
  private:
   int rows_, cols_;
   double** matrix_;
-  // static int nCount;
 
  public:
   S21Matrix();

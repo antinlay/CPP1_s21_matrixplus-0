@@ -1,7 +1,7 @@
 #include <cstdarg>
 
 #include "gtest/gtest.h"
-#include "s21_matrix_oop.hpp"
+#include "s21_matrix_oop.h"
 
 void printq(S21Matrix& other, string comment) {
   cout << comment << endl;
@@ -81,10 +81,17 @@ TEST(Matrix, Operations) {
   S21Matrix calc(3, 3);
   calc = basic.InverseMatrix();
   EXPECT_TRUE(calc == basic.InverseMatrix());
-  // calc.MulMatrix(basic);
+  calc.MulMatrix(basic);
+  for (auto i = 0; i < calc.getRows(); i++) {
+    for (auto j = 0; j < calc.getCols(); j++) {
+      EXPECT_EQ(round(calc.getMatrix()[i][j]), one.getMatrix()[i][j]);
+    }
+  }
   // printq(calc, "CALC MATRIX: ");
   // printq(one, "ONE MATRIX: ");
-  // EXPECT_EQ(one, calc);
+  // EXPECT_EQ(one.getMatrix(), calc.getMatrix());
+  S21Matrix det(5, 5);
+  EXPECT_EQ(round(det.Determinant()), 0.0);
 }
 
 TEST(Matrix, Operators) {
@@ -113,13 +120,13 @@ TEST(Matrix, Operators) {
   EXPECT_EQ(sum, basic);
   sum = sum * sum;
   basic = basic * basic;
-  printq(sum, "SUM AFTER MULT: ");
-  printq(basic, "basic AFTER MULT: ");
+  //   printq(sum, "SUM AFTER MULT: ");
+  //   printq(basic, "basic AFTER MULT: ");
   EXPECT_EQ(basic, sum);
   basic = basic - sum;
   sum = sum - basic;
-  printq(sum, "SUM AFTER SUB: ");
-  printq(basic, "basic AFTER SUB: ");
+  //   printq(sum, "SUM AFTER SUB: ");
+  //   printq(basic, "basic AFTER SUB: ");
   EXPECT_FALSE(basic == sum);
 }
 

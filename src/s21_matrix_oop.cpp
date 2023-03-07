@@ -1,19 +1,16 @@
-#include "s21_matrix_oop.hpp"
+#include "s21_matrix_oop.h"
 
+// Constructors and destructor
 S21Matrix::S21Matrix() : rows_(1), cols_(1) {
-  // if (matrix_) delMatrix(matrix_);
   cout << "Constructor 1 address: " << this << endl;
   alocMatrix(&matrix_, rows_, cols_);
   // nCount++;
 }
 
 S21Matrix::S21Matrix(int rows, int cols) : rows_(rows), cols_(cols) {
-  // if (matrix_) delMatrix(matrix_);
   cout << "Constructor 2 address: " << this << endl;
   alocMatrix(&matrix_, rows_, cols_);
   cout << " NEW MATRIX WITH rows: " << rows_ << " cols: " << cols_ << endl;
-
-  // nCount++;
 }
 
 S21Matrix::S21Matrix(const S21Matrix& other)
@@ -42,7 +39,7 @@ S21Matrix::~S21Matrix() {
     delMatrix(matrix_);
   }
 }
-
+// Additional functions
 void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
   if (rows < 1) {
     throw invalid_argument("Invalid number of rows " + to_string(rows));
@@ -50,9 +47,9 @@ void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
   if (cols < 1) {
     throw invalid_argument("Invalid number of cols " + to_string(cols));
   }
-  *matrix = new double*[rows];
+  *matrix = new double*[rows]();
   for (int i = 0; i < rows; i++) {
-    (*matrix)[i] = new double[cols];
+    (*matrix)[i] = new double[cols]();
   }
 }
 
@@ -63,13 +60,25 @@ void S21Matrix::delMatrix(double** matrix) {
   delete[] matrix;
 }
 
+void S21Matrix::checkIndexes(int i, int j) {
+  if (i < 0 || i > rows_ - 1) {
+    throw out_of_range("Invalid argument i - number of rows out of range [0:" +
+                       to_string(rows_ - 1) + "]");
+  }
+  if (j < 0 || j > cols_ - 1) {
+    throw out_of_range("Invalid argument j - number of cols out of range [0:" +
+                       to_string(cols_ - 1) + "]");
+  }
+}
+
+double** S21Matrix::getMatrix() const { return matrix_; }
+
+// Accessor and mutator (Getters setters)
 int S21Matrix::getRows() const { return rows_; }
 int S21Matrix::getCols() const { return cols_; }
-double** S21Matrix::getMatrix() const { return matrix_; }
 
 void S21Matrix::setRows(int rows) {
   if (rows == rows_) return;
-  // rows_ = rows;
   double** new_matrix;
   alocMatrix(&new_matrix, rows, cols_);
   for (int i = 0; i < rows && i < rows_; i++) {
@@ -95,7 +104,7 @@ void S21Matrix::setCols(int cols) {
   cols_ = cols;
   matrix_ = new_matrix;
 }
-
+// Ariphmetic operations
 bool S21Matrix::EqMatrix(const S21Matrix& other) const {
   if (rows_ != other.rows_ || cols_ != other.cols_) return false;
   for (int i = 0; i < rows_; i++) {
@@ -225,21 +234,14 @@ S21Matrix S21Matrix::InverseMatrix() {
   inverse.MulNumber(1 / det);
   return inverse;
 }
-
+// Operators + - * = == *= -= +=
 double& S21Matrix::operator()(int i, int j) {
   checkIndexes(i, j);
-  if (fabs(matrix_[i][j]) < EPS) {
-    matrix_[i][j] = 0.0;
-  }
   return matrix_[i][j];
 }
 
 S21Matrix& S21Matrix::operator=(const S21Matrix& other) {
-  rows_ = other.rows_;
-  cols_ = other.cols_;
-  // matrix_ = other.matrix_;
-  alocMatrix(&matrix_, rows_, cols_);
-
+  S21Matrix(other.rows_, other.cols_);
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
       matrix_[i][j] = other.matrix_[i][j];
@@ -258,24 +260,18 @@ S21Matrix S21Matrix::operator+(const S21Matrix& other) {
 S21Matrix S21Matrix::operator-(const S21Matrix& other) {
   S21Matrix res = *this;
   res.SubMatrix(other);
-  // this->SubMatrix(other);
-  // return *this;
   return res;
 }
 
 S21Matrix S21Matrix::operator*(const S21Matrix& other) {
   S21Matrix res = *this;
   res.MulMatrix(other);
-  // this->MulMatrix(other);
-  // return *this;
   return res;
 }
 
 S21Matrix S21Matrix::operator*(const double& num) {
   S21Matrix res = *this;
   MulNumber(num);
-  // this->MulNumber(num);
-  // return *this;
   return res;
 }
 
@@ -284,64 +280,6 @@ bool S21Matrix::operator==(const S21Matrix& other) const {
 }
 
 void S21Matrix::operator+=(const S21Matrix& other) { SumMatrix(other); }
-
 void S21Matrix::operator-=(const S21Matrix& other) { SubMatrix(other); }
-
 void S21Matrix::operator*=(const S21Matrix& other) { MulMatrix(other); }
 void S21Matrix::operator*=(const double& num) { MulNumber(num); }
-
-void S21Matrix::checkIndexes(int i, int j) {
-  if (i < 0 || i > rows_ - 1) {
-    throw out_of_range("Invalid argument i - number of rows out of range [0:" +
-                       to_string(rows_ - 1) + "]");
-  }
-  if (j < 0 || j > cols_ - 1) {
-    throw out_of_range("Invalid argument j - number of cols out of range [0:" +
-                       to_string(cols_ - 1) + "]");
-  }
-}
-
-// void printq(S21Matrix& other, string comment) {
-//   cout << comment << endl;
-//   cout << "rows: " << other.getRows() << " cols: " << other.getCols() <<
-//   endl; if (other.getMatrix()) {
-//     for (int i = 0; i < other.getRows(); i++) {
-//       for (int j = 0; j < other.getCols(); j++) {
-//         cout << other(i, j) << " ";
-//       }
-//       cout << endl;
-//     }
-//   }
-// }
-
-// int main(void) {
-//   S21Matrix basic(3, 3);
-//   basic(0, 0) = 1;
-//   basic(0, 1) = 2;
-//   basic(0, 2) = 4;
-//   basic(1, 0) = 3;
-//   basic(1, 1) = 3;
-//   basic(1, 2) = 5;
-//   basic(2, 0) = 2;
-//   basic(2, 1) = 4;
-//   basic(2, 2) = 4;
-
-//   S21Matrix one(3, 3);
-//   one(0, 0) = 1.0;
-//   one(0, 1) = 0.0;
-//   one(0, 2) = 0.0;
-//   one(1, 0) = 0.0;
-//   one(1, 1) = 1.0;
-//   one(1, 2) = 0.0;
-//   one(2, 0) = 0.0;
-//   one(2, 1) = 0.0;
-//   one(2, 2) = 1.0;
-
-//   S21Matrix calc(3, 3);
-//   calc = basic.InverseMatrix();
-//   calc *= basic;
-//   printq(calc, "CALC MATRIX: ");
-//   printq(one, "ONE MATRIX: ");
-//   if (calc == one) cout << "TRUE" << endl;
-//   return 0;
-// }
