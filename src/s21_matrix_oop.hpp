@@ -10,8 +10,8 @@ using namespace std;
 
 class S21Matrix {
  private:
-  mutable int rows_, cols_;
-  mutable double** matrix_;
+  int rows_, cols_;
+  double** matrix_;
   // static int nCount;
 
  public:
@@ -19,11 +19,11 @@ class S21Matrix {
 
   S21Matrix(int rows, int cols);
   S21Matrix(const S21Matrix& other);
-  S21Matrix(const S21Matrix&& other);
+  S21Matrix(S21Matrix&& other);
 
   // OPERTATORS:
   double& operator()(int i, int j);
-  void operator=(const S21Matrix& other);
+  S21Matrix& operator=(const S21Matrix& other);
   S21Matrix operator+(const S21Matrix& other);
   S21Matrix operator-(const S21Matrix& other);
   S21Matrix operator*(const S21Matrix& other);
@@ -32,6 +32,7 @@ class S21Matrix {
   void operator+=(const S21Matrix& other);
   void operator-=(const S21Matrix& other);
   void operator*=(const S21Matrix& other);
+  void operator*=(const double& num);
 
   // OPERATIONS
   bool EqMatrix(const S21Matrix& other) const;
@@ -44,7 +45,6 @@ class S21Matrix {
   S21Matrix CalcComplements();
   S21Matrix InverseMatrix();
   double Determinant();
-  // S21Matrix InverseMatrix();
 
   // ADDITIONAL FUNCTIONS:
   void alocMatrix(double*** matrix, int& rows, int& cols);
@@ -52,19 +52,15 @@ class S21Matrix {
   int getRows() const;
   int getCols() const;
   // void mainLoop(int& rows, int& cols, void (*func)(int, int, S21Matrix));
-  // void cpy(int i, int j, S21Matrix& other) {
-  //   matrix_[i][j] = other.matrix_[i][j];
-  // }
   // static int getCount() { return nCount; }
   double** getMatrix() const;
 
   void setRows(int rows);
   void setCols(int cols);
   void checkIndexes(int i, int j);
+  // double roundEPS(double val);
 
   ~S21Matrix();
 };
-
-// void print(S21Matrix& other, string comment);
 
 #endif
