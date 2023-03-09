@@ -4,7 +4,6 @@
 S21Matrix::S21Matrix() : rows_(1), cols_(1) {
   cout << "Constructor 1 address: " << this << endl;
   alocMatrix(&matrix_, rows_, cols_);
-  // nCount++;
 }
 
 S21Matrix::S21Matrix(int rows, int cols) : rows_(rows), cols_(cols) {
@@ -69,6 +68,13 @@ void S21Matrix::checkIndexes(int i, int j) {
     throw out_of_range("Invalid argument j - number of cols out of range [0:" +
                        to_string(cols_ - 1) + "]");
   }
+  if (floor(fabs(matrix_[i][j])) < EPS) {
+    if (fabs(matrix_[i][j]) < EPS) {
+      matrix_[i][j] = 0.0;
+    } else {
+      matrix_[i][j] = round(matrix_[i][j]);
+    }
+  }
 }
 
 double** S21Matrix::getMatrix() const { return matrix_; }
@@ -109,7 +115,7 @@ bool S21Matrix::EqMatrix(const S21Matrix& other) const {
   if (rows_ != other.rows_ || cols_ != other.cols_) return false;
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
-      if (matrix_[i][j] != other.matrix_[i][j]) return false;
+      if (fabs(other.matrix_[i][j] - matrix_[i][j]) > EPS) return false;
     }
   }
   return true;
@@ -210,6 +216,48 @@ double S21Matrix::Determinant() {
   return result;
 }
 
+void S21Matrix::swapRows(int j) {
+  checkIndexes(j, j);
+  for (int i = j + 1; i < rows_; i++) {
+    if (matrix_[i][j]) {
+      for (int c = 0; c < cols_; c++) {
+        double tmp = matrix_[i][c];
+        matrix_[i][c] = matrix_[j][c];
+        matrix_[j][c] = tmp;
+      }
+    }
+  }
+}
+
+double S21Matrix::s21_determinant() {
+  int ok;
+  S21Matrix tmp(rows_, cols_);
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      tmp.matrix_[i][j] = matrix_[i][j];
+    }
+  }
+  for (int i = 0; i < tmp.rows_; i++) {
+    if (tmp.matrix_[i][i] == 0) {
+      ok = swap_rows(&tmp, i);
+      sign = -sign;
+    }
+    if (!ok) {
+      for (int j = i + 1; j < tmp.rows_; j++) {
+        quotient = tmp.matrix_[j][i] / tmp.matrix_[i][i];
+        for (int x = i; x < tmp.cols_; x++) {
+          tmp.matrix_[j][x] = tmp.matrix_[j][x] - quotient * tmp.matrix_[i][x];
+        }
+      }
+      *result *= tmp.matrix_[i][i];
+    } else {
+      *result = 0;
+      break;
+    }
+  }
+  return err;
+}
+
 S21Matrix S21Matrix::CalcComplements() {
   if (rows_ != cols_) {
     throw runtime_error(
@@ -237,6 +285,7 @@ S21Matrix S21Matrix::InverseMatrix() {
 // Operators + - * = == *= -= +=
 double& S21Matrix::operator()(int i, int j) {
   checkIndexes(i, j);
+
   return matrix_[i][j];
 }
 

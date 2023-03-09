@@ -41,6 +41,8 @@ TEST(Matrix, Move) {
   basic(1, 1) = 31.31;
   S21Matrix copy(basic);
   S21Matrix mv(move(basic));
+  printq(basic, "BASIC MATRIX: ");
+  printq(mv, "MV MATRIX: ");
   EXPECT_EQ(mv, copy);
   EXPECT_FALSE(mv == basic);
 }
@@ -82,14 +84,9 @@ TEST(Matrix, Operations) {
   calc = basic.InverseMatrix();
   EXPECT_TRUE(calc == basic.InverseMatrix());
   calc.MulMatrix(basic);
-  for (auto i = 0; i < calc.getRows(); i++) {
-    for (auto j = 0; j < calc.getCols(); j++) {
-      EXPECT_EQ(round(calc.getMatrix()[i][j]), one.getMatrix()[i][j]);
-    }
-  }
-  // printq(calc, "CALC MATRIX: ");
-  // printq(one, "ONE MATRIX: ");
-  // EXPECT_EQ(one.getMatrix(), calc.getMatrix());
+  printq(calc, "CALC MATRIX: ");
+  printq(one, "ONE MATRIX: ");
+  EXPECT_EQ(one, calc);
   S21Matrix det(5, 5);
   EXPECT_EQ(round(det.Determinant()), 0.0);
 }

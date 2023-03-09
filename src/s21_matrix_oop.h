@@ -48,16 +48,16 @@ class S21Matrix {
   // ADDITIONAL FUNCTIONS:
   void alocMatrix(double*** matrix, int& rows, int& cols);
   void delMatrix(double** matrix);
+  void checkIndexes(int i, int j);
+  void swapRows(int j);
+  double s21_determinant();
+  // Setters and getters
   int getRows() const;
   int getCols() const;
-  // void mainLoop(int& rows, int& cols, void (*func)(int, int, S21Matrix));
-  // static int getCount() { return nCount; }
   double** getMatrix() const;
 
   void setRows(int rows);
   void setCols(int cols);
-  void checkIndexes(int i, int j);
-  // double roundEPS(double val);
 
   ~S21Matrix();
 };
