@@ -35,7 +35,7 @@ testing:
   tags:
     - gitlab
   script:
-    - ./test
+    - . test
   after_script:
     - bash $CI_PROJECT_DIR/src/tg_notif.sh $CI_JOB_STATUS
     
