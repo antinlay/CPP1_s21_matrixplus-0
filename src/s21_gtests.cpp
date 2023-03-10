@@ -5,126 +5,132 @@
 
 void printq(S21Matrix& other, string comment) {
   cout << comment << endl;
-  cout << "rows: " << other.getRows() << " cols: " << other.getCols() << endl;
-  if (other.getMatrix()) {
-    for (int i = 0; i < other.getRows(); i++) {
-      for (int j = 0; j < other.getCols(); j++) {
+  cout << "rows: " << other.GetRows() << " cols: " << other.GetCols() << endl;
+  if (other.GetMatrix()) {
+    for (int i = 0; i < other.GetRows(); i++) {
+      for (int j = 0; j < other.GetCols(); j++) {
         cout << other(i, j) << " ";
       }
       cout << endl;
     }
   }
 }
+
+void fillMatrix(double* seq, S21Matrix& other) {
+  int n = 0;
+  for (int i = 0; i < other.GetRows(); i++) {
+    for (int j = 0; j < other.GetCols(); j++) {
+      other(i, j) = seq[n++];
+    }
+  }
+}
+
 TEST(Matrix, Constructors) {
   S21Matrix left;
   left(0, 0) = 11.11;
-  S21Matrix right(1, 1);
-  right(0, 0) = 11.11;
-  EXPECT_EQ(left, right);
+  S21Matrix Right(1, 1);
+  Right(0, 0) = 11.11;
+  EXPECT_EQ(left, Right);
 }
 
 TEST(Matrix, Copy) {
-  S21Matrix basic(2, 2);
-  basic(0, 0) = 11.11;
-  basic(0, 1) = 12.12;
-  basic(1, 0) = 21.21;
-  basic(1, 1) = 31.31;
-  S21Matrix copy(basic);
-  EXPECT_EQ(basic, copy);
+  S21Matrix Basic(2, 2);
+  double seq[] = {11.11, 12.12, 21.21, 31.31};
+  fillMatrix(seq, Basic);
+  printq(Basic, "Basic MATRIX: ");
+  S21Matrix copy(Basic);
+  EXPECT_EQ(Basic, copy);
 }
 
 TEST(Matrix, Move) {
-  S21Matrix basic(2, 2);
-  basic(0, 0) = 11.11;
-  basic(0, 1) = 12.12;
-  basic(1, 0) = 21.21;
-  basic(1, 1) = 31.31;
-  S21Matrix copy(basic);
-  S21Matrix mv(move(basic));
-  printq(basic, "BASIC MATRIX: ");
-  printq(mv, "MV MATRIX: ");
-  EXPECT_EQ(mv, copy);
-  EXPECT_FALSE(mv == basic);
+  S21Matrix Basic(2, 2);
+  double seq[] = {11.11, 12.12, 21.21, 31.31};
+  fillMatrix(seq, Basic);
+  S21Matrix copy(Basic);
+  S21Matrix Move(move(Basic));
+  printq(Basic, "Basic MATRIX: ");
+  printq(Move, "Move MATRIX: ");
+  EXPECT_EQ(Move, copy);
+  EXPECT_FALSE(Move == Basic);
 }
 
 TEST(Matrix, SetterGetter) {
-  S21Matrix right(123, 911);
-  EXPECT_EQ(right.getCols(), 911);
-  EXPECT_EQ(right.getRows(), 123);
-  right.setRows(2);
-  EXPECT_EQ(right.getRows(), 2);
-  right.setCols(20);
-  EXPECT_EQ(right.getCols(), 20);
+  S21Matrix Right(123, 911);
+  EXPECT_EQ(Right.GetCols(), 911);
+  EXPECT_EQ(Right.GetRows(), 123);
+  Right.SetRows(2);
+  EXPECT_EQ(Right.GetRows(), 2);
+  Right.SetCols(20);
+  EXPECT_EQ(Right.GetCols(), 20);
 }
 
 TEST(Matrix, Operations) {
-  S21Matrix basic(3, 3);
-  basic(0, 0) = 1;
-  basic(0, 1) = 2;
-  basic(0, 2) = 4;
-  basic(1, 0) = 3;
-  basic(1, 1) = 3;
-  basic(1, 2) = 5;
-  basic(2, 0) = 2;
-  basic(2, 1) = 4;
-  basic(2, 2) = 4;
+  S21Matrix Basic(3, 3);
+  double seq[] = {1, 2, 4, 3, 3, 5, 2, 4, 4};
+  fillMatrix(seq, Basic);
+  S21Matrix One(3, 3);
+  double seq_one[] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+  fillMatrix(seq_one, One);
+  S21Matrix Calc(3, 3);
+  Calc = Basic.InverseMatrix();
+  EXPECT_TRUE(Calc == Basic.InverseMatrix());
+  Calc.MulMatrix(Basic);
+  printq(Calc, "Calc MATRIX: ");
+  printq(One, "One MATRIX: ");
+  EXPECT_EQ(One, Calc);
+}
 
-  S21Matrix one(3, 3);
-  one(0, 0) = 1.0;
-  one(0, 1) = 0.0;
-  one(0, 2) = 0.0;
-  one(1, 0) = 0.0;
-  one(1, 1) = 1.0;
-  one(1, 2) = 0.0;
-  one(2, 0) = 0.0;
-  one(2, 1) = 0.0;
-  one(2, 2) = 1.0;
-
-  S21Matrix calc(3, 3);
-  calc = basic.InverseMatrix();
-  EXPECT_TRUE(calc == basic.InverseMatrix());
-  calc.MulMatrix(basic);
-  printq(calc, "CALC MATRIX: ");
-  printq(one, "ONE MATRIX: ");
-  EXPECT_EQ(one, calc);
-  S21Matrix det(5, 5);
-  EXPECT_EQ(round(det.Determinant()), 0.0);
+TEST(Matrix, Determinant) {
+  S21Matrix Det = S21Matrix();
+  Det(0, 0) = 214214321.4325452;
+  EXPECT_EQ(Det.Determinant(), Det(0, 0));
+  Det.SetCols(4);
+  Det.SetRows(4);
+  double seq[] = {1, 2, 3, 5, 6, 1, 12, 3, 0, 11, 2, 33, 7, 68, 9, 71};
+  fillMatrix(seq, Det);
+  double det = -6984.0;
+  EXPECT_EQ(Det.Determinant(), det);
+  Det.SetCols(80);
+  Det.SetRows(80);
+  EXPECT_EQ(Det.Determinant(), 0.0);
+  for (int i = 0; i < Det.GetRows(); i++) {
+    for (int j = 0; j < Det.GetCols(); j++) {
+      Det(i, j) = (random() % 1000) * 0.01;
+    }
+  }
+  cout << "DETERMINANT " + to_string(Det.Determinant()) << endl;
+  det = Det.Determinant();
+  EXPECT_EQ(det, Det.Determinant());
+  // printq(Det, "Det MATRIX: ");
 }
 
 TEST(Matrix, Operators) {
-  S21Matrix basic(3, 3);
-  basic(0, 0) = 11.01;
-  basic(0, 1) = 22.02;
-  basic(0, 2) = 33.03;
-  basic(1, 0) = 44.04;
-  basic(1, 1) = 55.05;
-  basic(1, 2) = 66.06;
-  basic(2, 0) = 77.07;
-  basic(2, 1) = 88.08;
-  basic(2, 2) = 99.09;
-
-  S21Matrix sum(3, 3);
-  sum = basic + basic;
-  basic * 2.0;
-  EXPECT_EQ(sum, basic);
+  S21Matrix Basic(3, 3);
+  double seq[] = {11.01, 22.02, 33.03, 44.04, 55.05,
+                  66.06, 77.07, 88.08, 99.09};
+  fillMatrix(seq, Basic);
+  S21Matrix Sum(3, 3);
+  Sum = Basic + Basic;
+  Basic * 2.0;
+  EXPECT_EQ(Sum, Basic);
   for (int i = 0; i < 3; i++) {
-    sum += basic;
-    sum *= 2.0;
-    EXPECT_FALSE(sum == basic);
-    sum *= 0.5;
-    sum -= basic;
+    Sum += Basic;
+    Sum *= 2.0;
+    EXPECT_FALSE(Sum == Basic);
+    Sum *= 0.5;
+    Sum -= Basic;
   }
-  EXPECT_EQ(sum, basic);
-  sum = sum * sum;
-  basic = basic * basic;
-  //   printq(sum, "SUM AFTER MULT: ");
-  //   printq(basic, "basic AFTER MULT: ");
-  EXPECT_EQ(basic, sum);
-  basic = basic - sum;
-  sum = sum - basic;
-  //   printq(sum, "SUM AFTER SUB: ");
-  //   printq(basic, "basic AFTER SUB: ");
-  EXPECT_FALSE(basic == sum);
+  EXPECT_EQ(Sum, Basic);
+  Sum = Sum * Sum;
+  Basic = Basic * Basic;
+  //   printq(Sum, "Sum AFTER MULT: ");
+  //   printq(Basic, "Basic AFTER MULT: ");
+  EXPECT_EQ(Basic, Sum);
+  Basic = Basic - Sum;
+  Sum = Sum - Basic;
+  //   printq(Sum, "Sum AFTER SUB: ");
+  //   printq(Basic, "Basic AFTER SUB: ");
+  EXPECT_FALSE(Basic == Sum);
 }
 
 TEST(Matrix, Errors) {
@@ -135,12 +141,12 @@ TEST(Matrix, Errors) {
   EXPECT_THROW(error_sub_l -= error_sub_r, invalid_argument);
   EXPECT_THROW(error_sub_l += error_sub_r, invalid_argument);
   EXPECT_THROW(error_sub_l *= error_sub_r, invalid_argument);
-  S21Matrix basic(4, 4);
+  S21Matrix Basic(4, 4);
   EXPECT_THROW(error_sub_l.Determinant(), runtime_error);
   EXPECT_THROW(error_sub_l.CalcComplements(), runtime_error);
-  EXPECT_THROW(basic.InverseMatrix(), runtime_error);
-  EXPECT_THROW(basic(-12, 1) = 1, out_of_range);
-  EXPECT_THROW(basic(1, 123) = 14, out_of_range);
+  EXPECT_THROW(Basic.InverseMatrix(), runtime_error);
+  EXPECT_THROW(Basic(-12, 1) = 1, out_of_range);
+  EXPECT_THROW(Basic(1, 123) = 14, out_of_range);
 }
 
 int main(int argc, char** argv) {

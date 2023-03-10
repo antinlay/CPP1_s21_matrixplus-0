@@ -1,14 +1,13 @@
 #include "s21_matrix_oop.h"
 
-// Constructors and destructor
 S21Matrix::S21Matrix() : rows_(1), cols_(1) {
   cout << "Constructor 1 address: " << this << endl;
-  alocMatrix(&matrix_, rows_, cols_);
+  AlocMatrix(&matrix_, rows_, cols_);
 }
 
 S21Matrix::S21Matrix(int rows, int cols) : rows_(rows), cols_(cols) {
   cout << "Constructor 2 address: " << this << endl;
-  alocMatrix(&matrix_, rows_, cols_);
+  AlocMatrix(&matrix_, rows_, cols_);
   cout << " NEW MATRIX WITH rows: " << rows_ << " cols: " << cols_ << endl;
 }
 
@@ -35,11 +34,11 @@ S21Matrix::S21Matrix(S21Matrix&& other) {
 S21Matrix::~S21Matrix() {
   cout << "Destructor RUN address: " << this << endl;
   if (matrix_) {
-    delMatrix(matrix_);
+    DelMatrix(matrix_);
   }
 }
 // Additional functions
-void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
+void S21Matrix::AlocMatrix(double*** matrix, int& rows, int& cols) {
   if (rows < 1) {
     throw invalid_argument("Invalid number of rows " + to_string(rows));
   }
@@ -52,14 +51,14 @@ void S21Matrix::alocMatrix(double*** matrix, int& rows, int& cols) {
   }
 }
 
-void S21Matrix::delMatrix(double** matrix) {
+void S21Matrix::DelMatrix(double** matrix) {
   for (int i = 0; i < rows_; i++) {
     delete[] matrix[i];
   }
   delete[] matrix;
 }
 
-void S21Matrix::checkIndexes(int i, int j) {
+void S21Matrix::CheckIndexes(int i, int j) {
   if (i < 0 || i > rows_ - 1) {
     throw out_of_range("Invalid argument i - number of rows out of range [0:" +
                        to_string(rows_ - 1) + "]");
@@ -68,45 +67,46 @@ void S21Matrix::checkIndexes(int i, int j) {
     throw out_of_range("Invalid argument j - number of cols out of range [0:" +
                        to_string(cols_ - 1) + "]");
   }
-  if (floor(fabs(matrix_[i][j])) < EPS) {
+  double check = fabs(matrix_[i][j]) - floor(fabs(matrix_[i][j]));
+  if (check < EPS) {
     if (fabs(matrix_[i][j]) < EPS) {
       matrix_[i][j] = 0.0;
     } else {
-      matrix_[i][j] = round(matrix_[i][j]);
+      matrix_[i][j] = floor(matrix_[i][j]);
     }
   }
 }
 
-double** S21Matrix::getMatrix() const { return matrix_; }
+double** S21Matrix::GetMatrix() const { return matrix_; }
 
 // Accessor and mutator (Getters setters)
-int S21Matrix::getRows() const { return rows_; }
-int S21Matrix::getCols() const { return cols_; }
+int S21Matrix::GetRows() const { return rows_; }
+int S21Matrix::GetCols() const { return cols_; }
 
-void S21Matrix::setRows(int rows) {
+void S21Matrix::SetRows(int rows) {
   if (rows == rows_) return;
   double** new_matrix;
-  alocMatrix(&new_matrix, rows, cols_);
+  AlocMatrix(&new_matrix, rows, cols_);
   for (int i = 0; i < rows && i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
       new_matrix[i][j] = (*this)(i, j);
     }
   }
-  delMatrix(matrix_);
+  DelMatrix(matrix_);
   rows_ = rows;
   matrix_ = new_matrix;
 }
 
-void S21Matrix::setCols(int cols) {
+void S21Matrix::SetCols(int cols) {
   if (cols == cols_) return;
   double** new_matrix;
-  alocMatrix(&new_matrix, rows_, cols);
+  AlocMatrix(&new_matrix, rows_, cols);
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols && j < cols_; j++) {
       new_matrix[i][j] = (*this)(i, j);
     }
   }
-  delMatrix(matrix_);
+  DelMatrix(matrix_);
   cols_ = cols;
   matrix_ = new_matrix;
 }
@@ -146,7 +146,7 @@ void S21Matrix::SubMatrix(const S21Matrix& other) {
 void S21Matrix::MulNumber(const double num) {
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
-      matrix_[i][j] = matrix_[i][j] * num;
+      matrix_[i][j] = (*this)(i, j) * num;
     }
   }
 }
@@ -162,7 +162,7 @@ void S21Matrix::MulMatrix(const S21Matrix& other) {
     for (int j = 0; j < res.cols_; j++) {
       double sum = 0;
       for (int k = 0; k < cols_; k++) {
-        sum += matrix_[i][k] * other.matrix_[k][j];
+        sum += (*this)(i, k) * other.matrix_[k][j];
       }
       res.matrix_[i][j] = sum;
     }
@@ -181,23 +181,23 @@ S21Matrix S21Matrix::Transpose() {
 }
 
 S21Matrix S21Matrix::Minor(int i_row, int j_col) {
-  checkIndexes(i_row, j_col);
+  CheckIndexes(i_row, j_col);
   int rows = rows_ - 1, cols = cols_ - 1;
   if (rows_ == 1) rows = 1;
   if (cols_ == 1) cols = 1;
-  S21Matrix minor(rows, cols);
+  S21Matrix Minor(rows, cols);
   int k = 0, l;
   for (int r = 0; r < rows_; r++) {
     if (i_row == r && rows_ != 1) continue;
     l = 0;
     for (int c = 0; c < cols_; c++) {
       if (j_col == c && cols_ != 1) continue;
-      minor(k, l) = (*this)(r, c);
+      Minor.matrix_[k][l] = (*this)(r, c);
       if (cols_ != 1) l++;
     }
     if (rows_ != 1) k++;
   }
-  return minor;
+  return Minor;
 }
 
 double S21Matrix::Determinant() {
@@ -206,56 +206,81 @@ double S21Matrix::Determinant() {
         "Invalid argument of rows or cols the matrix is not square");
   }
   double result = 0;
-  if (rows_ == 1) {
+  if (CheckZero() == 1) {
+    return 0.0;
+  } else if (rows_ == 1) {
     result = (*this)(0, 0);
-  } else {
+  } else if (rows_ == 2) {
+    result = (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0);
+  } else if (rows_ < 5) {
     for (int j = 0; j < cols_; j++) {
       result += (*this)(0, j) * Minor(0, j).Determinant() * pow(-1, j);
     }
+  } else {
+    result = GaussDet();
   }
   return result;
 }
-
-void S21Matrix::swapRows(int j) {
-  checkIndexes(j, j);
-  for (int i = j + 1; i < rows_; i++) {
-    if (matrix_[i][j]) {
-      for (int c = 0; c < cols_; c++) {
-        double tmp = matrix_[i][c];
-        matrix_[i][c] = matrix_[j][c];
-        matrix_[j][c] = tmp;
-      }
-    }
+// Swap rows
+void S21Matrix::SwapMaxRows(double** matrix, int maxrow, int j) {
+  for (int c = 0; c < cols_; c++) {
+    double temp = matrix[j][c];
+    matrix[j][c] = matrix[maxrow][c];
+    matrix[maxrow][c] = temp;
   }
 }
-
-double S21Matrix::s21_determinant() {
-  int ok;
-  S21Matrix tmp(rows_, cols_);
+// Check rows or cols with only zero's
+int S21Matrix::CheckZero() {
+  int zero = 0;
   for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < cols_; j++) {
-      tmp.matrix_[i][j] = matrix_[i][j];
-    }
-  }
-  for (int i = 0; i < tmp.rows_; i++) {
-    if (tmp.matrix_[i][i] == 0) {
-      ok = swap_rows(&tmp, i);
-      sign = -sign;
-    }
-    if (!ok) {
-      for (int j = i + 1; j < tmp.rows_; j++) {
-        quotient = tmp.matrix_[j][i] / tmp.matrix_[i][i];
-        for (int x = i; x < tmp.cols_; x++) {
-          tmp.matrix_[j][x] = tmp.matrix_[j][x] - quotient * tmp.matrix_[i][x];
+    if ((*this)(i, 0) == 0) {
+      for (int j = 1; j < cols_; j++) {
+        for (int k = 1; k < cols_; k++) {
+          if ((*this)(k, i) != 0) break;
+          if ((k + 1) == cols_) zero = 1;
         }
+        if ((*this)(i, j) != 0) break;
+        if ((j + 1) == cols_) zero = 1;
       }
-      *result *= tmp.matrix_[i][i];
-    } else {
-      *result = 0;
-      break;
     }
   }
-  return err;
+  return zero;
+}
+// Determinant
+double S21Matrix::GaussDet() {
+  S21Matrix Det(*this);
+  int n = rows_;
+  double res = 1.0;
+
+  for (int i = 0; i < n; i++) {
+    // Find max element in col(i)
+    int maxrow = i;
+    for (int j = i + 1; j < n; j++) {
+      if (fabs(Det(j, i)) > fabs(Det(maxrow, i))) {
+        maxrow = j;
+      }
+    }
+
+    // Change of place rows i and maxrow
+    if (i != maxrow) {
+      SwapMaxRows(Det.matrix_, maxrow, i);
+      res *= -1.0;
+    }
+
+    // Zero's all elements down main diagonal
+    for (int j = i + 1; j < n; j++) {
+      double factor = Det(j, i) / Det(i, i);
+      for (int k = i + 1; k < n; k++) {
+        Det.matrix_[j][k] -= factor * Det(i, k);
+      }
+      Det.matrix_[j][i] = 0.0;
+    }
+
+    // Calculate GaussDet
+    res *= Det(i, i);
+  }
+
+  return res;
 }
 
 S21Matrix S21Matrix::CalcComplements() {
@@ -263,28 +288,28 @@ S21Matrix S21Matrix::CalcComplements() {
     throw runtime_error(
         "Invalid argument of rows or cols the matrix is not square");
   }
-  S21Matrix calc_compl(rows_, cols_);
+  S21Matrix Calc(rows_, cols_);
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
-      calc_compl(i, j) = Minor(i, j).Determinant() * pow(-1, i + j);
+      Calc.matrix_[i][j] = Minor(i, j).Determinant() * pow(-1, i + j);
     }
   }
-  return calc_compl;
+  return Calc;
 }
 
 S21Matrix S21Matrix::InverseMatrix() {
   const double det = Determinant();
   if (fabs(det) < EPS) {
-    throw runtime_error("Error: matrix determinant is 0");
+    throw runtime_error("Error: matrix GaussDet is 0");
   }
-  S21Matrix inverse(cols_, rows_);
-  inverse = CalcComplements().Transpose();
-  inverse.MulNumber(1 / det);
-  return inverse;
+  S21Matrix Inverse(cols_, rows_);
+  Inverse = CalcComplements().Transpose();
+  Inverse.MulNumber(1 / det);
+  return Inverse;
 }
 // Operators + - * = == *= -= +=
 double& S21Matrix::operator()(int i, int j) {
-  checkIndexes(i, j);
+  CheckIndexes(i, j);
 
   return matrix_[i][j];
 }

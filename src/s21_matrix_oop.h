@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -46,18 +47,19 @@ class S21Matrix {
   double Determinant();
 
   // ADDITIONAL FUNCTIONS:
-  void alocMatrix(double*** matrix, int& rows, int& cols);
-  void delMatrix(double** matrix);
-  void checkIndexes(int i, int j);
-  void swapRows(int j);
-  double s21_determinant();
+  void AlocMatrix(double*** matrix, int& rows, int& cols);
+  void DelMatrix(double** matrix);
+  void CheckIndexes(int i, int j);
+  void SwapMaxRows(double** matrix, int maxrow, int j);
+  double GaussDet();
+  int CheckZero();
   // Setters and getters
-  int getRows() const;
-  int getCols() const;
-  double** getMatrix() const;
+  int GetRows() const;
+  int GetCols() const;
+  double** GetMatrix() const;
 
-  void setRows(int rows);
-  void setCols(int cols);
+  void SetRows(int rows);
+  void SetCols(int cols);
 
   ~S21Matrix();
 };
