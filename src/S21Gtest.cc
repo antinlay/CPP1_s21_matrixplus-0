@@ -1,20 +1,7 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "s21_matrix_oop.h"
 
-void printMatrix(S21Matrix& other, std::string comment) {
-  std::cout << comment << std::endl;
-  std::cout << "rows: " << other.GetRows() << " cols: " << other.GetCols()
-            << std::endl;
-  if (other.GetMatrix()) {
-    for (int i = 0; i < other.GetRows(); i++) {
-      for (int j = 0; j < other.GetCols(); j++) {
-        std::cout << other(i, j) << " ";
-      }
-      std::cout << std::endl;
-    }
-  }
-}
- 
 void fillMatrix(double* seq, S21Matrix& other) {
   int n = 0;
   for (int i = 0; i < other.GetRows(); i++) {
@@ -36,7 +23,6 @@ TEST(Matrix, Copy) {
   S21Matrix basic(2, 2);
   double seq[] = {11.11, 12.12, 21.21, 31.31};
   fillMatrix(seq, basic);
-  printMatrix(basic, "basic MATRIX: ");
   S21Matrix copy(basic);
   EXPECT_EQ(basic, copy);
 }
@@ -47,8 +33,6 @@ TEST(Matrix, Move) {
   fillMatrix(seq, basic);
   S21Matrix copy(basic);
   S21Matrix move(std::move(basic));
-  printMatrix(basic, "basic MATRIX: ");
-  printMatrix(move, "move MATRIX: ");
   EXPECT_EQ(move, copy);
   EXPECT_FALSE(move == basic);
 }
@@ -74,8 +58,6 @@ TEST(Matrix, Operations) {
   calc = basic.InverseMatrix();
   EXPECT_TRUE(calc == basic.InverseMatrix());
   calc.MulMatrix(basic);
-  printMatrix(calc, "calc MATRIX: ");
-  printMatrix(one, "one MATRIX: ");
   EXPECT_EQ(one, calc);
 }
 
@@ -97,7 +79,6 @@ TEST(Matrix, Determinant) {
       other(i, j) = (random() % 1000) * 0.01;
     }
   }
-  std::cout << "DETERMINANT " + std::to_string(other.Determinant()) << std::endl;
   det = other.Determinant();
   EXPECT_EQ(det, other.Determinant());
 }

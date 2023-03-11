@@ -50,7 +50,6 @@ class S21Matrix {
   int GetCols() const;
   void SetRows(int rows);
   void SetCols(int cols);
-  double** GetMatrix() const;
 
  private:
   int rows_, cols_;

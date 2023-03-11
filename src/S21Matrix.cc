@@ -70,8 +70,6 @@ void S21Matrix::CheckIndexes(int i, int j) {
   }
 }
 
-double** S21Matrix::GetMatrix() const { return matrix_; }
-
 // Accessor and mutator (Getters and setters)
 int S21Matrix::GetRows() const { return rows_; }
 int S21Matrix::GetCols() const { return cols_; }
