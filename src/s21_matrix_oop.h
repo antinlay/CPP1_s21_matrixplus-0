@@ -1,7 +1,7 @@
 #ifndef CPP1_S21_MATRIXPLUS_S21_MATRIX_OOP_H_
 #define CPP1_S21_MATRIXPLUS_S21_MATRIX_OOP_H_
 
-#define EPS 10E-9  /* Required accuracy */ 
+#define EPS 10E-9
 
 class S21Matrix {
  public:
