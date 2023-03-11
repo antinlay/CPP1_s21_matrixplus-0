@@ -11,7 +11,7 @@ building:
   only:
     - develop
   script:
-    - find $CI_PROJECT_DIR -name "Makefile" -execdir make all \;
+    - find $CI_PROJECT_DIR -name "Makefile" -execdir make \;
   artifacts:
     paths:
       - $CI_PROJECT_DIR/src/s21_matrix_oop.a
