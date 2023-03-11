@@ -24,7 +24,7 @@ stylecheck:
   tags:
     - gitlab
   script:
-    - name_ch="*.[cpph]"
+    - name_ch="*.[cch]"
     - output=$(clang-format -style="{$(grep ./materials/linters/.clang-format -e "BasedOnStyle")}" -n $(find $CI_PROJECT_DIR/src -name $name_ch) 2>&1) 
     - if [ -n "$output" ]; then echo "$output" && return 2; fi
 

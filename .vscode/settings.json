@@ -3,6 +3,7 @@
         "stdexcept": "cpp",
         "new": "cpp",
         "ostream": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "string_view": "cpp"
     }
 }
