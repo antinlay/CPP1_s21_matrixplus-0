@@ -37,7 +37,7 @@ class S21Matrix {
   S21Matrix InverseMatrix();
   double Determinant();
 
-  // ADDITIONAL FUNCTIONS:
+  // ADDITIONAL METHODS:
   void AlocMatrix(double*** matrix, int rows, int cols);
   void DelMatrix(double** matrix);
   void CheckIndexes(int i, int j);
